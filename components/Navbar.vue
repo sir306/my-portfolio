@@ -1,5 +1,7 @@
 <template>
-  <nav class="absolute flex flex-row-reverse w-full text-white p-2">
+  <nav
+    class="absolute flex flex-row-reverse w-full text-white px-6 mt-3 mb-0 pb-0"
+  >
     <div v-for="btnLink in btnLinks">
       <nuxt-link :to="btnLink.redirectLink">
         <button
