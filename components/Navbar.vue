@@ -1,5 +1,6 @@
 <template>
   <nav
+    id="navbar"
     class="absolute flex flex-row-reverse w-full text-white px-6 mt-3 mb-0 pb-0"
   >
     <div v-for="btnLink in btnLinks">
@@ -45,6 +46,17 @@ export default {
   },
   mounted() {
     function fadeNavbar(router, location) {
+      gsap.to("#navbar", {
+        y: -20,
+        duration: 2,
+        ease: "power3.inOut",
+      });
+      gsap.to("#navbar", {
+        y: 0,
+        duration: 2,
+        ease: "power3.inOut",
+        delay: 2,
+      });
       gsap.to("#homeBtn", {
         opacity: 0,
         duration: 2,
