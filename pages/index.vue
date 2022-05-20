@@ -55,8 +55,8 @@ import {
 import OrbitControls from "orbit-controls-es6";
 export default {
   mounted() {
-    const dat = require("dat.gui");
-    const gui = new dat.GUI();
+    // const dat = require("dat.gui");
+    // const gui = new dat.GUI();
     const world = {
       plane: {
         width: 400,
@@ -65,10 +65,10 @@ export default {
         heightSegments: 50,
       },
     };
-    gui.add(world.plane, "width", 1, 1000).onChange(generatePlane);
-    gui.add(world.plane, "height", 1, 1000).onChange(generatePlane);
-    gui.add(world.plane, "widthSegments", 1, 500).onChange(generatePlane);
-    gui.add(world.plane, "heightSegments", 1, 500).onChange(generatePlane);
+    // gui.add(world.plane, "width", 1, 1000).onChange(generatePlane);
+    // gui.add(world.plane, "height", 1, 1000).onChange(generatePlane);
+    // gui.add(world.plane, "widthSegments", 1, 500).onChange(generatePlane);
+    // gui.add(world.plane, "heightSegments", 1, 500).onChange(generatePlane);
 
     function generatePlane() {
       planeMesh.geometry.dispose();

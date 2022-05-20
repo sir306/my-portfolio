@@ -32,4 +32,10 @@ html {
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
 }
+#container {
+  -webkit-font-smoothing: antialiased;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
 </style>
