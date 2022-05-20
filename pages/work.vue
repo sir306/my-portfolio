@@ -1,7 +1,7 @@
 <template>
   <div>
-    <canvas class="w-auto px-0 py-0" ref="canvas"></canvas>
-    <div id="container" class="absolute w-full px-6 py-12">
+    <canvas ref="canvas"></canvas>
+    <div id="container" class="absolute w-full px-6 my-2">
       <h2
         ref="title"
         class="text-white font-exo2 text-5xl uppercase opacity-0 mb-3"
@@ -71,7 +71,7 @@ export default {
           },
           title: "Fullstack PROJECTS",
           alt: "image of code",
-          redirectLink: "/",
+          redirectLink: "/fullstackwork",
         },
         {
           image: {
@@ -79,7 +79,7 @@ export default {
           },
           title: "mobile PROJECTS",
           alt: "image of a mobile",
-          redirectLink: "/",
+          redirectLink: "/mobilework",
         },
         {
           image: {
@@ -87,7 +87,7 @@ export default {
           },
           title: "other PROJECTS",
           alt: "image of hallway",
-          redirectLink: "/",
+          redirectLink: "/otherwork",
         },
       ],
     };
