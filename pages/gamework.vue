@@ -26,6 +26,11 @@
           :githubTitle="project.githubTitle"
           :githubLink="project.githubLink"
         />
+        <hr
+          ref="projectLine"
+          class="opacity-0 mb-5"
+          style="transform: translateY(60px)"
+        />
       </div>
     </div>
   </div>
@@ -80,6 +85,12 @@ export default {
   },
   mounted() {
     gsap.to(this.$refs.titleLine, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(this.$refs.projectLine, {
       opacity: 1,
       duration: 2,
       y: 0,
