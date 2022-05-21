@@ -310,6 +310,61 @@ export default {
             this.$router.push("/work");
           },
         });
+        gsap.to("#navbar", {
+          y: -20,
+          duration: 2,
+          ease: "power3.inOut",
+        });
+        gsap.to("#navbar", {
+          y: 0,
+          duration: 2,
+          ease: "power3.inOut",
+          delay: 2,
+        });
+        gsap.to("#homeBtn", {
+          opacity: 0,
+          duration: 2,
+          ease: "power3.inOut",
+        });
+        gsap.to("#homeBtn", {
+          opacity: 1,
+          duration: 2,
+          ease: "power3.inOut",
+          delay: 2,
+        });
+        gsap.to("#projectBtn", {
+          opacity: 0,
+          duration: 2,
+          ease: "power3.inOut",
+        });
+        gsap.to("#projectBtn", {
+          opacity: 1,
+          duration: 2,
+          ease: "power3.inOut",
+          delay: 2,
+        });
+        gsap.to("#aboutBtn", {
+          opacity: 0,
+          duration: 2,
+          ease: "power3.inOut",
+        });
+        gsap.to("#aboutBtn", {
+          opacity: 1,
+          duration: 2,
+          ease: "power3.inOut",
+          delay: 2,
+        });
+        gsap.to("#contactBtn", {
+          opacity: 0,
+          duration: 2,
+          ease: "power3.inOut",
+        });
+        gsap.to("#contactBtn", {
+          opacity: 1,
+          duration: 2,
+          ease: "power3.inOut",
+          delay: 2,
+        });
       });
 
     addEventListener("resize", () => {
