@@ -1,17 +1,27 @@
 <template>
   <div>
-    <canvas ref="canvas"></canvas>
-    <div
-      id="container"
-      class="absolute text-white text-center w-full max-w-2xl px-6"
-    >
-      <h1 class="text-white uppercase">Game Projects</h1>
+    <canvas ref="canvas" style="display: block"></canvas>
+    <div id="container" class="absolute w-full px-3 md:px-6 my-2">
+      <h1
+        ref="title"
+        class="text-white font-exo2 text-3xl md:text-5xl uppercase opacity-0 mb-3"
+        style="transform: translateY(30px)"
+      >
+        Game Projects
+      </h1>
+      <div v-for="project in projectData">
+        <Project
+          :title="project.projectTitle"
+          :description="project.projectDescription"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import gsap from "gsap";
+import Project from "@/components/Project";
 import {
   PlaneGeometry,
   BufferAttribute,
@@ -32,7 +42,26 @@ import {
 import OrbitControls from "orbit-controls-es6";
 
 export default {
+  components: {
+    Project,
+  },
+  data() {
+    return {
+      projectData: [
+        {
+          projectTitle: "Test Title",
+          projectDescription: "Test Description",
+        },
+      ],
+    };
+  },
   mounted() {
+    gsap.to(this.$refs.title, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
     const raycaster = new Raycaster();
     const scene = new Scene();
     const camera = new PerspectiveCamera(

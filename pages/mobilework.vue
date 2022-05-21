@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas ref="canvas"></canvas>
+    <canvas ref="canvas" style="display: block"></canvas>
     <div
       id="container"
       class="absolute text-white text-center w-full max-w-2xl px-6"
