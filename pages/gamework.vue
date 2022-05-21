@@ -19,6 +19,7 @@
       />
       <div v-for="project in projectData">
         <Project
+          class="mb-3"
           :title="project.title"
           :description="project.description"
           :youtubeLink="project.youtubeLink"
@@ -63,6 +64,14 @@ export default {
           description:
             "This is my second Unreal Engine project, in this project you can see that it is comprised of C++ and UE Blueprints, this game is a single level prototype with multiple weapons and enemies. The enemies have varying speed, health, and damage amount to give the prototype some variety and depth. All firearms created stem from a base class I created and use line tracing from the crosshairs and the barrel tip and detect to see if there is blocking hits that are different to indicate that there is a possible actor in the way of the barrel and the target destination, the bullet trails are created using textures from the barrel to the end point, followed by an impact to give the illusion of bullet impacts. To keep the project simple and quick to deploy the enemies were given only melee weapons and simple AI tasks and movement to create a quick and fun prototype.",
           youtubeLink: "https://www.youtube.com/embed/FcHFTqIKmGA",
+          githubTitle: "View Shooter Project Repo",
+          githubLink: "https://github.com/sir306/ShooterProject",
+        },
+        {
+          title: "First Person Shooter Unreal Engine",
+          description:
+            "This is my second Unreal Engine project, in this project you can see that it is comprised of C++ and UE Blueprints, this game is a single level prototype with multiple weapons and enemies. The enemies have varying speed, health, and damage amount to give the prototype some variety and depth. All firearms created stem from a base class I created and use line tracing from the crosshairs and the barrel tip and detect to see if there is blocking hits that are different to indicate that there is a possible actor in the way of the barrel and the target destination, the bullet trails are created using textures from the barrel to the end point, followed by an impact to give the illusion of bullet impacts. To keep the project simple and quick to deploy the enemies were given only melee weapons and simple AI tasks and movement to create a quick and fun prototype.",
+
           githubTitle: "View Shooter Project Repo",
           githubLink: "https://github.com/sir306/ShooterProject",
         },

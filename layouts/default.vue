@@ -25,6 +25,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+  overflow-y: hidden !important;
 }
 *,
 *::before,
@@ -49,5 +50,10 @@ html {
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE 10+ */
+}
+#container::-webkit-scrollbar {
+  width: 0px !important;
 }
 </style>
