@@ -1,9 +1,17 @@
 <template>
   <div class="project-example text-white">
     <h1>{{ title }}</h1>
+    <iframe
+      class="w-11/12 md:w-1/2 h-96"
+      :src="youtubeLink"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+    ></iframe>
     <p>{{ description }}</p>
-    <!-- <a :href="youtubeLink">{{ youtubeTitle }}</a>
-    <a :href="githubLink">{{ githubTitle }}</a> -->
+
+    <!-- <a :href="githubLink">{{ githubTitle }}</a> -->
   </div>
 </template>
 
@@ -17,6 +25,6 @@ export default {
   //     githubTitle: String,
   //     githubLink: String,
   //   },
-  props: ["title", "description"],
+  props: ["title", "description", "youtubeLink", "githubLink", "githubTitle"],
 };
 </script>

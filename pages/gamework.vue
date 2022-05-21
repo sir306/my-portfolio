@@ -11,8 +11,9 @@
       </h1>
       <div v-for="project in projectData">
         <Project
-          :title="project.projectTitle"
-          :description="project.projectDescription"
+          :title="project.title"
+          :description="project.description"
+          :youtubeLink="project.youtubeLink"
         />
       </div>
     </div>
@@ -49,8 +50,9 @@ export default {
     return {
       projectData: [
         {
-          projectTitle: "Test Title",
-          projectDescription: "Test Description",
+          title: "First Person Shooter Unreal Engine",
+          description: "Test Description",
+          youtubeLink: "https://www.youtube.com/embed/FcHFTqIKmGA",
         },
       ],
     };
