@@ -3,15 +3,43 @@
     <canvas ref="canvas" style="display: block"></canvas>
     <div
       id="container"
-      class="absolute text-white text-center w-full max-w-2xl px-6"
+      class="absolute w-full px-3 md:px-6 my-2 overflow-y-auto h-4/5"
     >
-      <h1 class="text-white uppercase">Fullstack Projects</h1>
+      <h1
+        ref="title"
+        class="text-white font-exo2 text-3xl md:text-5xl uppercase opacity-0 mb-3"
+        style="transform: translateY(30px)"
+      >
+        Fullstack Projects
+      </h1>
+      <hr
+        ref="titleLine"
+        class="opacity-0 mb-5"
+        style="transform: translateY(60px)"
+      />
+
+      <div v-for="project in projectData">
+        <Project
+          class="mb-3"
+          :title="project.title"
+          :description="project.description"
+          :youtubeLink="project.youtubeLink"
+          :githubTitle="project.githubTitle"
+          :githubLink="project.githubLink"
+        />
+        <hr
+          ref="projectLine"
+          class="opacity-0 mb-5"
+          style="transform: translateY(60px)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import gsap from "gsap";
+import Project from "@/components/Project";
 import {
   PlaneGeometry,
   BufferAttribute,
@@ -32,7 +60,57 @@ import {
 import OrbitControls from "orbit-controls-es6";
 
 export default {
+  components: {
+    Project,
+  },
+  data() {
+    return {
+      projectData: [
+        {
+          title: "Sunday Markets",
+          description:
+            "This is my Level 6 Diploma capstone project, I worked in a team of two to create a fullstack application using the MERN stack and SocketIO. The main components that I worked on was the shopping cart and the instant realtime message chat system were I used SocketIO to achieve this. Another feature I built for the shopping cart was the refresh mechanizm that works on the frontend and the backend, were it removes carts that haven't either been refreshed or updated after 30 minutes and returns stock levels to their previous values. ",
+          youtubeLink: "",
+          githubTitle: "View Sunday Market Repo",
+          githubLink: "https://github.com/sunday-market/sunday-market-app",
+        },
+        {
+          title: "Club Ex",
+          description:
+            "In this project we developed a fullstack application to create a gym website that could give gym members the abiltiy to access online material to see exercises and provide management a means to add more content.",
+          youtubeLink: "",
+          githubTitle: "View Club Ex Repo",
+          githubLink: "https://github.com/minlopalis/club-ex",
+        },
+        // {
+        //   title: "",
+        //   description: "",
+        //   youtubeLink: "",
+        //   githubTitle: "",
+        //   githubLink: "",
+        // },
+      ],
+    };
+  },
   mounted() {
+    gsap.to(this.$refs.titleLine, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(this.$refs.projectLine, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(this.$refs.title, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
     const raycaster = new Raycaster();
     const scene = new Scene();
     const camera = new PerspectiveCamera(

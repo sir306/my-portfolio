@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="bg-black opacity-50 h-screen w-screen absolute"></div>
     <Navbar />
     <Nuxt />
   </div>

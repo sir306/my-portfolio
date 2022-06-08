@@ -66,7 +66,7 @@
           </svg>
 
           <a
-            class="border-solid border-2 px-2 mx-2 py-1 rounded hover:bg-white hover:text-gray-800"
+            class="border-solid border-2 px-2 mx-2 my-0 rounded hover:bg-white hover:text-gray-800"
             style="cursor: pointer; height: 6vh"
             :href="githubLink"
             >{{ githubTitle }}</a
