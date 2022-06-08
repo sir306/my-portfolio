@@ -52,7 +52,7 @@ import {
   Float32BufferAttribute,
   Points,
 } from "three";
-import OrbitControls from "orbit-controls-es6";
+
 export default {
   mounted() {
     // const dat = require("dat.gui");
@@ -127,9 +127,6 @@ export default {
 
     renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(devicePixelRatio);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    console.log(controls);
 
     const planeGeometry = new PlaneGeometry(1);
     const planeMaterial = new MeshPhongMaterial({
