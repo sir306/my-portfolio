@@ -29,7 +29,6 @@ import {
   Float32BufferAttribute,
   Points,
 } from "three";
-import OrbitControls from "orbit-controls-es6";
 
 export default {
   mounted() {
