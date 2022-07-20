@@ -56,15 +56,7 @@
           class="opacity-0 mb-5"
           style="transform: translateY(60px)"
         />
-        <!-- WARNING MESSAGE for users -->
-        <p
-          class="text-red-700 font-exo2 text-2xl md:text-3xl uppercase opacity-1 mb-0"
-        >
-          This section is still under construction and requires testing with my
-          hosting provider for form submissions, so if i don't reply this is due
-          to this hosting issues but you can contact me on linkedin and i will
-          respond within 24hrs
-        </p>
+
         <div class="justify-self-center max-w-4xl">
           <p
             class="text-white font-exo2 text-lg md:text-2xl uppercase opacity-1 mb-0"
