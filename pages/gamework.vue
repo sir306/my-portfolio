@@ -83,7 +83,7 @@ export default {
         {
           title: "Speedy Demon Racer",
           description:
-            "This project was a school project for the game module, in this project the game engine used was GODOT, where the game is scripted using GD script. The game features two playable levels and a tutorial level, the objective of game is to race around the track avoiding explosive dangers and negative shield power ups, which cause the the shield around the race track to fail and start to shrink allowing the lava in. The player is racing against the clock to the next beacon on the track and will loose the game if the clock runs out. From this project I was able to learn some core skills such as animations, collisions, game design and game optimization.",
+            "This project was a school project for the game module, in this project the game engine used was GODOT, where the game is scripted using GD script. The game features two playable levels and a tutorial level, the objective of game is to race around the track avoiding explosive dangers and negative shield power ups, which cause the shield around the race track to fail and start to shrink allowing the lava in. The player is racing against the clock to the next beacon on the track and will loose the game if the clock runs out. From this project I was able to learn some core skills such as animations, collisions, game design and game optimization.",
 
           githubTitle: "View Speed Demon Racer Repo",
           githubLink:

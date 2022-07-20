@@ -86,7 +86,7 @@ export default {
     gsap.to(this.$refs.projects, {
       opacity: 1,
       duration: 3,
-      x: 0,
+      x: 1,
       y: 0,
       stagger: 0.4,
       ease: "expo",
