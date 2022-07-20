@@ -15,6 +15,9 @@
 import gsap from "gsap";
 export default {
   props: ["paragraph"],
+
+  // this method is generate a random number and to offset the blurbs - currently it seems to always align
+  // to one side as they all use the same ref so i am looking at changing the ref to another referance point
   methods: {
     randomNumber: function () {
       let x = Math.random();
