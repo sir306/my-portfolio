@@ -56,71 +56,14 @@
           class="opacity-0 mb-5"
           style="transform: translateY(60px)"
         />
-        <!-- WARNING MESSAGE for users -->
-        <p
-          class="text-red-700 font-exo2 text-2xl md:text-3xl uppercase opacity-1 mb-0"
-        >
-          This section is still under construction and requires testing with my
-          hosting provider for form submissions, so if i don't reply this is due
-          to this hosting issues but you can contact me on linkedin and i will
-          respond within 24hrs
-        </p>
         <div class="justify-self-center max-w-4xl">
           <p
             class="text-white font-exo2 text-lg md:text-2xl uppercase opacity-1 mb-0"
           >
-            Contact Form
+            Message Sent
           </p>
         </div>
-        <div class="justify-self-center">
-          <!-- form start -->
-          <form
-            class="grid grid-cols-3 gap-6"
-            name="contact"
-            method="POST"
-            action="/contactmesuccess"
-            data-netlify="true"
-          >
-            <label
-              for="name"
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Your Name:</label
-            >
-            <input
-              class="col-span-2 p-1 text-black text-sm rounded-sm md:text-lg font-exo2 tracking-wider"
-              type="text"
-              name="name"
-            />
-            <label
-              for="email"
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Your Email:</label
-            >
-            <input
-              class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
-              type="email"
-              name="email"
-            />
 
-            <label
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Message:</label
-            >
-            <textarea
-              class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
-              name="message"
-            >
-Say hello to me..</textarea
-            >
-
-            <button
-              class="col-start-2 col-span-1 border-solid border-2 py-1 px-4 rounded-md border-white text-white text-sm md:text-lg font-exo2 tracking-wider hover:bg-white hover:text-gray-800"
-              type="submit"
-            >
-              Send
-            </button>
-          </form>
-        </div>
         <hr
           ref="endLine"
           class="opacity-0 mb-5 mt-5"
