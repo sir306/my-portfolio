@@ -81,7 +81,7 @@
             action="/contactmesuccess"
             data-netlify="true"
           >
-            <input type="hidden" name="form-name" value="Contact" />
+            <input type="hidden" name="form-name" value="contact" />
             <label
               for="name"
               class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
