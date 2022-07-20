@@ -98,13 +98,13 @@ export default {
       y: 0,
       ease: "expo",
     });
-    gsap.to(this.$refs.projectLine, {
+    gsap.to(this.$refs.title, {
       opacity: 1,
       duration: 2,
       y: 0,
       ease: "expo",
     });
-    gsap.to(this.$refs.title, {
+    gsap.to(this.$refs.projectLine, {
       opacity: 1,
       duration: 2,
       y: 0,
