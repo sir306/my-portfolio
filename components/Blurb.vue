@@ -21,8 +21,6 @@ export default {
   methods: {
     randomNumber: function () {
       let x = Math.random();
-      console.log(x);
-      console.log(x < 0.5);
       if (this.x > 0.5) {
         return x * 400;
       } else {
@@ -31,12 +29,15 @@ export default {
     },
   },
 
+  // this gsap is to offset the x position and y position
   mounted() {
     gsap.to(this.$refs.blurb, {
       duration: 0,
       opacity: 0,
       x: this.randomNumber(),
+      y: this.randomNumber(),
     });
+    // this gsap is to return to origin i.e., the center of the screen
     gsap.to(this.$refs.blurb, {
       opacity: 1,
       duration: 3,
