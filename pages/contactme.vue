@@ -83,6 +83,7 @@
               class="col-span-2 p-1 text-black text-sm rounded-sm md:text-lg font-exo2 tracking-wider"
               type="text"
               name="name"
+              required
             />
             <label
               for="email"
@@ -93,6 +94,7 @@
               class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
               type="email"
               name="email"
+              required
             />
 
             <label
@@ -102,6 +104,7 @@
             <textarea
               class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
               name="message"
+              required
             >
 Say hello to me..</textarea
             >
