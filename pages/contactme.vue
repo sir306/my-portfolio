@@ -72,6 +72,7 @@
             method="POST"
             action="/contactmesuccess"
             data-netlify="true"
+            style="transform: translateY(60px)"
           >
             <input type="hidden" name="form-name" value="contact" />
             <label
@@ -83,6 +84,7 @@
               class="col-span-2 p-1 text-black text-sm rounded-sm md:text-lg font-exo2 tracking-wider"
               type="text"
               name="name"
+              placeholder="Tell me who you are.."
               required
             />
             <label
@@ -94,6 +96,7 @@
               class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
               type="email"
               name="email"
+              placeholder="Enter your email here.."
               required
             />
 
