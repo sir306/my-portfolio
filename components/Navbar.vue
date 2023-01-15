@@ -6,7 +6,17 @@
     <div v-for="btnLink in btnLinks">
       <nuxt-link event="" :id="btnLink.id" :to="btnLink.redirectLink">
         <button
-          class="border rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase hover:bg-white hover:text-gray-800 md:text-xl"
+          v-if="currentUrl === btnLink.path"
+          :id="btnLink.path"
+          class="border rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase bg-white text-gray-800 md:text-xl btn-fade"
+          disabled
+        >
+          {{ btnLink.title }}
+        </button>
+        <button
+          v-else="currentUrl !== btnLink.path"
+          :id="btnLink.path"
+          class="border rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase hover:bg-white hover:text-gray-800 md:text-xl btn-fade"
         >
           {{ btnLink.title }}
         </button>
@@ -24,87 +34,63 @@ export default {
         {
           id: "contactBtn",
           title: "Contact",
+          path: "contactme",
           redirectLink: "/contactme",
         },
         {
           id: "aboutBtn",
           title: "About",
+          path: "aboutme",
           redirectLink: "/aboutme",
         },
         {
           id: "projectBtn",
           title: "Projects",
+          path: "work",
           redirectLink: "/work",
         },
         {
           id: "homeBtn",
           title: "Home",
+          path: "index",
           redirectLink: "/",
         },
       ],
+      currentUrl: "",
     };
+  },
+  created() {
+    this.currentUrl = this.$route.name;
   },
   mounted() {
     function fadeNavbar(router, location) {
       gsap.to("#navbar", {
         y: -20,
-        duration: 2,
+        duration: 0.6,
         ease: "power3.inOut",
       });
       gsap.to("#navbar", {
         y: 0,
-        duration: 2,
+        duration: 0.6,
         ease: "power3.inOut",
-        delay: 2,
+        delay: 0.6,
       });
-      gsap.to("#homeBtn", {
+      gsap.to(".btn-fade", {
         opacity: 0,
-        duration: 2,
+        duration: 0.6,
         ease: "power3.inOut",
         onComplete: () => {
           router.push(location);
         },
       });
-      gsap.to("#homeBtn", {
+      gsap.to(".btn-fade", {
         opacity: 1,
-        duration: 2,
+        duration: 1.2,
         ease: "power3.inOut",
-        delay: 2,
-      });
-      gsap.to("#projectBtn", {
-        opacity: 0,
-        duration: 2,
-        ease: "power3.inOut",
-      });
-      gsap.to("#projectBtn", {
-        opacity: 1,
-        duration: 2,
-        ease: "power3.inOut",
-        delay: 2,
-      });
-      gsap.to("#aboutBtn", {
-        opacity: 0,
-        duration: 2,
-        ease: "power3.inOut",
-      });
-      gsap.to("#aboutBtn", {
-        opacity: 1,
-        duration: 2,
-        ease: "power3.inOut",
-        delay: 2,
-      });
-      gsap.to("#contactBtn", {
-        opacity: 0,
-        duration: 2,
-        ease: "power3.inOut",
-      });
-      gsap.to("#contactBtn", {
-        opacity: 1,
-        duration: 2,
-        ease: "power3.inOut",
-        delay: 2,
+        delay: 0.8,
       });
     }
+
     // home button
     document.querySelector("#homeBtn").addEventListener("click", (event) => {
       let pageName = this.$router.history.current.name;
@@ -136,6 +122,19 @@ export default {
         fadeNavbar(this.$router, "/contactme");
       }
     });
+
+    // set the navlink to an activated style if current page
+    document.querySelectorAll(".btn-fade").forEach((btn) => {
+      console.log(this.$route.name);
+      if (btn.id === this.$route.name) {
+        btn.className += "bg-white";
+      }
+    });
+  },
+  watch: {
+    $route(to, from) {
+      this.currentUrl = this.$route.name;
+    },
   },
 };
 </script>
