@@ -15,13 +15,13 @@
           v-for="project in projects"
           v-if="hasData(project.data)"
           class="w-full opacity-0 overflow-hidden"
-          style="transform: translateX(40px); width: 20vw"
+          style="transform: translateX(40px); width: 100%"
         >
           <nuxt-link :to="project.redirectLink">
             <img
               :src="project.image.url"
               :alt="project.alt"
-              style="height: 60vh; width: 20vw"
+              style="height: 60vh; width: 100%"
               class="object-cover"
             />
             <p
