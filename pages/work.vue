@@ -25,7 +25,7 @@
               class="object-cover"
             />
             <p
-              class="text-white uppercase font-ubuntu-mono text-md md:text-lg lg:text-5xl sm:font-thin"
+              class="text-white uppercase font-ubuntu-mono text-lg lg:text-5xl sm:font-thin"
             >
               {{ project.title }}
             </p>
