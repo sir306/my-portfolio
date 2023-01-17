@@ -9,10 +9,11 @@
       >
         My Work
       </h2>
-      <div class="flex space-x-3 justify-between">
+      <div class="flex space-x-3 justify-evenly overflow-hidden">
         <div
           ref="projects"
           v-for="project in projects"
+          v-if="hasData(project.data)"
           class="w-full opacity-0 overflow-hidden"
           style="transform: translateX(40px); width: 20vw"
         >
@@ -52,8 +53,22 @@ import {
   Float32BufferAttribute,
   Points,
 } from "three";
+import { FullStackProjects } from "../data/fullstackprojects";
+import { GameProjects } from "../data/gameprojects";
+import { MobileProjects } from "../data/mobileprojects";
+import { OtherProjects } from "../data/otherprojects";
 
 export default {
+  methods: {
+    hasData(data) {
+      if (data.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+  },
+
   data() {
     return {
       projects: [
@@ -64,30 +79,34 @@ export default {
           title: "GAME PROJECTS",
           alt: "retro game machine",
           redirectLink: "/gamework",
+          data: GameProjects,
         },
         {
           image: {
             url: fullstackImg,
           },
-          title: "Fullstack PROJECTS",
+          title: "FULLSTACK PROJECTS",
           alt: "image of code",
           redirectLink: "/fullstackwork",
+          data: FullStackProjects,
         },
         {
           image: {
             url: mobileImg,
           },
-          title: "mobile PROJECTS",
+          title: "MOBILE PROJECTS",
           alt: "image of a mobile",
           redirectLink: "/mobilework",
+          data: MobileProjects,
         },
         {
           image: {
             url: randomImg,
           },
-          title: "other PROJECTS",
+          title: "OTHER PROJECTS",
           alt: "image of hallway",
           redirectLink: "/otherwork",
+          data: OtherProjects,
         },
       ],
     };

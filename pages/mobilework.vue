@@ -3,14 +3,42 @@
     <canvas ref="canvas" style="display: block"></canvas>
     <div
       id="container"
-      class="absolute text-white text-center w-full max-w-2xl px-6"
+      class="absolute w-full px-3 md:px-6 my-2 overflow-y-auto h-4/5"
     >
-      <h1 class="text-white uppercase">Mobile Projects</h1>
+      <h1
+        ref="title"
+        class="text-white font-exo2 text-3xl md:text-5xl uppercase opacity-0 mb-3"
+        style="transform: translateY(30px)"
+      >
+        Mobile Projects
+      </h1>
+      <hr
+        ref="titleLine"
+        class="opacity-0 mb-5"
+        style="transform: translateY(60px)"
+      />
+
+      <div v-for="project in projectData">
+        <Project
+          class="mb-3"
+          :title="project.title"
+          :description="project.description"
+          :youtubeLink="project.youtubeLink"
+          :githubTitle="project.githubTitle"
+          :githubLink="project.githubLink"
+        />
+        <hr
+          ref="projectLine"
+          class="opacity-0 mb-5"
+          style="transform: translateY(60px)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { MobileProjects } from "../data/mobileprojects";
 import gsap from "gsap";
 import {
   PlaneGeometry,
@@ -31,6 +59,11 @@ import {
 } from "three";
 
 export default {
+  data() {
+    return {
+      projectData: MobileProjects,
+    };
+  },
   mounted() {
     const raycaster = new Raycaster();
     const scene = new Scene();

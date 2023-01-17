@@ -71,9 +71,9 @@ export default {
       });
       gsap.to("#navbar", {
         y: 0,
-        duration: 0.6,
+        duration: 1.2,
         ease: "power3.inOut",
-        delay: 0.6,
+        delay: 0.8,
       });
       gsap.to(".btn-fade", {
         opacity: 0,
@@ -125,7 +125,6 @@ export default {
 
     // set the navlink to an activated style if current page
     document.querySelectorAll(".btn-fade").forEach((btn) => {
-      console.log(this.$route.name);
       if (btn.id === this.$route.name) {
         btn.className += "bg-white";
       }
