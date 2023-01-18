@@ -25,6 +25,7 @@
           :youtubeLink="project.youtubeLink"
           :githubTitle="project.githubTitle"
           :githubLink="project.githubLink"
+          :languages="project.languages"
         />
         <hr
           ref="projectLine"

@@ -9,6 +9,16 @@
         <h1 class="font-ubuntu-mono uppercase text-lg md:text-3xl pb-2">
           {{ title }}
         </h1>
+
+        <div class="flex flex-wrap divide-x-2 justify-start">
+          <div
+            v-for="(language, index) in languages"
+            class="font-ubuntu-mono text-left text-md md:text-xl font-medium"
+            :class="{ 'pr-2': index === 0, 'px-2': index !== 0 }"
+          >
+            {{ language }}
+          </div>
+        </div>
       </div>
       <div class="flex-wrap md:flex">
         <iframe
@@ -40,10 +50,11 @@
           </svg>
 
           <a
-            class="border-solid border-2 px-2 mx-2 py-1 rounded hover:bg-white hover:text-gray-800"
+            class="shadow-2xl shadow-white align-baseline border-solid border-2 px-2 mx-2 py-1 rounded hover:bg-white hover:text-gray-800"
             style="cursor: pointer; height: 6vh"
             :href="githubLink"
-            >{{ githubTitle }}</a
+          >
+            {{ githubTitle }}</a
           >
         </div>
         <p
@@ -66,7 +77,7 @@
           </svg>
 
           <a
-            class="border-solid border-2 px-2 mx-2 my-0 rounded hover:bg-white hover:text-gray-800"
+            class="shadow-2xl shadow-white border-solid align-baseline border-2 px-2 mx-2 my-0 py-1 rounded hover:bg-white hover:text-gray-800"
             style="cursor: pointer; height: 6vh"
             :href="githubLink"
             >{{ githubTitle }}</a
@@ -80,7 +91,14 @@
 <script>
 import gsap from "gsap";
 export default {
-  props: ["title", "description", "youtubeLink", "githubLink", "githubTitle"],
+  props: [
+    "title",
+    "description",
+    "youtubeLink",
+    "githubLink",
+    "githubTitle",
+    "languages",
+  ],
 
   mounted() {
     gsap.to(this.$refs.projects, {

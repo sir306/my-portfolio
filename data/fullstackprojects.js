@@ -6,6 +6,7 @@ export const FullStackProjects = [
       youtubeLink: "",
       githubTitle: "View Sunday Market Repo",
       githubLink: "https://github.com/sunday-market/sunday-market-app",
+      languages: ["MongoDB","Express","ReactJS","NodeJS"],
     },
     {
       title: "Club Ex",
@@ -14,6 +15,7 @@ export const FullStackProjects = [
       youtubeLink: "",
       githubTitle: "View Club Ex Repo",
       githubLink: "https://github.com/minlopalis/club-ex",
+      languages: ["Python Django", "HTML5"],
     },
     // {
     //   title: "",

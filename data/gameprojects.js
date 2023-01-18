@@ -6,6 +6,7 @@ export const GameProjects = [
       youtubeLink: "https://www.youtube.com/embed/FcHFTqIKmGA",
       githubTitle: "View Shooter Project Repo",
       githubLink: "https://github.com/sir306/ShooterProject",
+      languages: ["C++"],
     },
     {
       title: "First Ultimate Unreal Engine Project",
@@ -14,6 +15,7 @@ export const GameProjects = [
 
       githubTitle: "View First UE Project Repo",
       githubLink: "https://github.com/sir306/UltimateGameTutCleaned",
+      languages: ["C++"],
     },
     {
       title: "Speedy Demon Racer",
@@ -23,5 +25,6 @@ export const GameProjects = [
       githubTitle: "View Speed Demon Racer Repo",
       githubLink:
         "https://github.com/sir306/IT6034_Project_SpeedyDemonRacerGame",
+      languages: ["GDScript"],
     },
   ];

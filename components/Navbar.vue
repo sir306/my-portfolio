@@ -8,7 +8,7 @@
         <button
           v-if="currentUrl === btnLink.path"
           :id="btnLink.path"
-          class="border rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase bg-white text-gray-800 md:text-xl btn-fade"
+          class="shadow-2xl shadow-white border-2 rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase bg-white text-gray-800 md:text-xl btn-fade"
           disabled
         >
           {{ btnLink.title }}
@@ -16,7 +16,7 @@
         <button
           v-else="currentUrl !== btnLink.path"
           :id="btnLink.path"
-          class="border rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase hover:bg-white hover:text-gray-800 md:text-xl btn-fade"
+          class="shadow-2xl shadow-white border-2 rounded px-3 py-1 mx-1 md:mx-2 lg:mx-3 font-ubuntu-mono uppercase hover:bg-white hover:text-gray-800 md:text-xl btn-fade"
         >
           {{ btnLink.title }}
         </button>
