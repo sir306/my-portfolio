@@ -10,11 +10,16 @@
           {{ title }}
         </h1>
 
-        <div class="flex flex-wrap divide-x-2 justify-start">
+        <div
+          class="flex flex-wrap divide-x-2 justify-start m-auto md:w-auto w-11/12"
+        >
           <div
             v-for="(language, index) in languages"
-            class="font-ubuntu-mono text-left text-md md:text-xl font-medium"
-            :class="{ 'pr-2': index === 0, 'px-2': index !== 0 }"
+            class="font-ubuntu-mono text-left text-lg md:text-xl font-medium"
+            :class="{
+              'pr-2': index === 0,
+              'px-2': index !== 0,
+            }"
           >
             {{ language }}
           </div>
@@ -32,7 +37,7 @@
         ></iframe>
         <p
           v-if="youtubeLink"
-          class="grow whitespace-wrap m-auto md:pl-6 w-11/12 md:w-1/2 text-left"
+          class="grow whitespace-wrap m-auto pt-4 md:pl-6 w-11/12 md:w-1/2 text-left"
         >
           {{ description }}
         </p>
@@ -59,7 +64,7 @@
         </div>
         <p
           v-if="!youtubeLink"
-          class="grow whitespace-wrap m-auto w-full text-left"
+          class="grow whitespace-wrap m-auto w-11/12 md:w-full text-left"
         >
           {{ description }}
         </p>
