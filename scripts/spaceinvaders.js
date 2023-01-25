@@ -78,17 +78,50 @@ export function run() {
     }
   }
 
-  const player = new Player();
-  const projectiles = [new Projectile({
-    position:{
-      x:300,
-      y:300,
-    },
-    velocity:{
-      x:0,
-      y:0
+  class Invader {
+
+    constructor() {
+      this.velocity = {
+        x: 0,
+        y: 0,
+      };
+      this.speed = 7;
+      const image = new Image();
+      image.src = "./invader.png";
+      image.onload = () => {
+        this.image = image;
+        const scale = 1;
+        this.width = image.width * scale;
+        this.height = image.height * scale;
+        this.position = {
+          x: spaceCanvas.width / 2 - this.width / 2,
+          y: spaceCanvas.height / 2,
+        };
+      };
     }
-  })];
+    draw() {
+      spaceContext.drawImage(
+        this.image,
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+    );   
+    }
+    update(){
+      if(!this.image) return
+
+      this.draw();
+      this.position.x += this.velocity.x
+      this.position.y += this.velocity.y
+      
+    }
+  }
+
+  const player = new Player();
+  const projectiles = [];
+  const invader = new Invader();
+  
 
   const keys = {
     a:{
@@ -105,10 +138,15 @@ export function run() {
   function animate() {
     requestAnimationFrame(animate);
     spaceContext.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-    
+    invader.update();
     player.update();
-    projectiles.forEach(projectile =>{
-      projectile.update();
+    projectiles.forEach((projectile, index) =>{
+      if(projectile.position.y + projectile.radius <= 0){
+        setTimeout(()=>{projectiles.splice(index, 1)},0)
+      }
+      else{
+        projectile.update();
+      }
     });
     if(keys.a.pressed && player.position.x >= 0){
       player.velocity.x = - player.speed;
@@ -116,6 +154,8 @@ export function run() {
     } else if(keys.d.pressed  && player.position.x + player.width <= spaceCanvas.width){
       player.velocity.x =  player.speed;
       player.rotation = 0.15;
+    } else if(keys.space.pressed){
+      
     }
     else{
       player.velocity.x = 0
@@ -135,7 +175,19 @@ export function run() {
         keys.d.pressed = true
         break;
       case " ":
-        console.log('space')
+        keys.space.pressed = true
+        projectiles.push(
+        new Projectile({
+            position:{
+              x:player.position.x + player.width / 2,
+              y:player.position.y,
+            },
+            velocity:{
+              x:0,
+              y:-10
+            }
+          })
+      )
         break;
     }
   });
@@ -148,7 +200,7 @@ export function run() {
         keys.d.pressed = false
         break;
       case " ":
-        console.log('space')
+        keys.space.pressed = false
         break;
     }
   });
