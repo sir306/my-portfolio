@@ -2,6 +2,7 @@
   <nav
     id="navbar"
     class="absolute flex flex-row-reverse w-full text-white px-6 mt-3 mb-0 pb-0"
+    style="z-index: 100"
   >
     <div v-for="btnLink in btnLinks">
       <nuxt-link event="" :id="btnLink.id" :to="btnLink.redirectLink">

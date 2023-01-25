@@ -4,6 +4,7 @@
     <div
       id="container"
       class="absolute w-full px-3 md:px-6 my-2 overflow-y-auto h-4/5"
+      style="background-color: rgba(0, 0, 0, 0.8)"
     >
       <h1
         ref="title"

@@ -1,8 +1,11 @@
 <template>
   <div
     ref="projects"
-    class="project-example text-white opacity-0"
-    style="transform: translateX(300px) translateY(300px)"
+    class="project-example text-white"
+    style="
+      transform: translateX(300px) translateY(300px);
+      background-color: rgba(0, 0, 0, 0.9);
+    "
   >
     <div class="text-center md:text-left">
       <div class="flex-wrap px-0 mt-1 mb-2">
