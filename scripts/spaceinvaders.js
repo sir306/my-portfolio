@@ -1,177 +1,21 @@
+import { Player } from "./game/classes/Player";
+import { Particle } from "./game/classes/Particle";
+import { Grid } from "./game/classes/Grid";
+import { Projectile } from "./game/classes/Projectile";
+
 export function run() {
   const spaceCanvas = document.getElementById("space-canvas");
-
   const spaceContext = spaceCanvas.getContext("2d");
+
   spaceCanvas.width = innerWidth;
   spaceCanvas.height = innerHeight;
-  class Player {
-    constructor() {
-      this.velocity = {
-        x: 0,
-        y: 0,
-      };
-      this.speed = 7;
-      this.rotation = 0;
-      const image = new Image();
-      image.src = "./spaceship.png";
-      image.onload = () => {
-        this.image = image;
-        const scale = 0.15;
-        this.width = image.width * scale;
-        this.height = image.height * scale;
-        this.position = {
-          x: spaceCanvas.width / 2 - this.width / 2,
-          y: spaceCanvas.height - this.height - 50,
-        };
-      };
-    }
-    draw() {
-      spaceContext.save();
-      spaceContext.translate(
-        player.position.x + player.width / 2,
-        player.position.y + player.height / 2
-      );
-      spaceContext.rotate(this.rotation);
-      spaceContext.translate(
-        -player.position.x - player.width / 2,
-        -player.position.y - player.height / 2
-      );
+  const scoreEl = document.getElementById("scoreEl");
 
-      spaceContext.drawImage(
-        this.image,
-        this.position.x,
-        this.position.y,
-        this.width,
-        this.height
-      );
-
-      spaceContext.restore();
-    }
-    update() {
-      if (!this.image) return;
-
-      this.draw();
-      this.position.x += this.velocity.x;
-    }
-  }
-
-  class Projectile {
-    constructor({ position, velocity }) {
-      this.position = position;
-      this.velocity = velocity;
-
-      this.radius = 4;
-    }
-
-    draw() {
-      spaceContext.beginPath();
-      spaceContext.arc(
-        this.position.x,
-        this.position.y,
-        this.radius,
-        0,
-        Math.PI * 2
-      );
-      spaceContext.fillStyle = "red";
-      spaceContext.fill();
-      spaceContext.closePath();
-    }
-
-    update() {
-      this.draw();
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-    }
-  }
-
-  class Invader {
-    constructor({ position }) {
-      this.velocity = {
-        x: 0,
-        y: 0,
-      };
-      this.speed = 7;
-      const image = new Image();
-      image.src = "./invader.png";
-      image.onload = () => {
-        this.image = image;
-        const scale = 1;
-        this.width = image.width * scale;
-        this.height = image.height * scale;
-        this.position = {
-          x: position.x,
-          y: position.y,
-        };
-      };
-    }
-    draw() {
-      spaceContext.drawImage(
-        this.image,
-        this.position.x,
-        this.position.y,
-        this.width,
-        this.height
-      );
-    }
-    update({ velocity }) {
-      if (!this.image) return;
-
-      this.draw();
-      this.position.x += velocity.x;
-      this.position.y += velocity.y;
-    }
-  }
-
-  class Grid {
-    constructor() {
-      this.position = {
-        x: 0,
-        y: 0,
-      };
-      this.velocity = {
-        x: 3,
-        y: 0,
-      };
-
-      this.invaders = [];
-      const columns = Math.floor(Math.random() * 10 + 5);
-      const rows = Math.floor(Math.random() * 5 + 2);
-
-      this.width = columns * 30;
-
-      for (let x = 0; x < columns; x++) {
-        for (let y = 0; y < rows; y++) {
-          this.invaders.push(
-            new Invader({
-              position: {
-                x: x * 30,
-                y: y * 30,
-              },
-            })
-          );
-        }
-      }
-    }
-
-    update() {
-      this.position.x += this.velocity.x;
-      this.position.y += this.velocity.y;
-
-      this.velocity.y = 0;
-
-      if (
-        this.position.x + this.width >= spaceCanvas.width ||
-        this.position.x <= 0
-      ) {
-        this.velocity.x = -this.velocity.x;
-        this.velocity.y = 30;
-      }
-    }
-  }
-
-  const player = new Player();
+  const player = new Player({ spaceCanvas });
   const projectiles = [];
   const grids = [];
+  const invaderProjectiles = [];
+  const particles = [];
 
   const keys = {
     a: {
@@ -187,14 +31,109 @@ export function run() {
 
   let frames = 0;
   let randomInterval = Math.floor(Math.random() * 500 + 500);
+  let game = {
+    over: false,
+    active: true,
+  };
+  let score = 0;
+
+  function createParticles({ object, color }) {
+    for (let i = 0; i < 15; i++) {
+      particles.push(
+        new Particle({
+          position: {
+            x: object.position.x + object.width / 2,
+            y: object.position.y + object.height / 2,
+          },
+          velocity: {
+            x: (Math.random() - 0.5) * 2,
+            y: (Math.random() - 0.5) * 2,
+          },
+          radius: Math.random() * 3,
+          color: color || "#BAA0DE",
+        })
+      );
+    }
+  }
 
   function animate() {
+    if (!game.active) return;
     requestAnimationFrame(animate);
     spaceContext.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
+
+    player.update({ spaceContext, player });
+
+    particles.forEach((particle, i) => {
+      if (particle.opacity <= 0) {
+        setTimeout(() => {
+          particles.splice(i, 1);
+        }, 0);
+      } else {
+        particle.update({ spaceContext });
+      }
+    });
+
+    invaderProjectiles.forEach((invaderProjectile, index) => {
+      if (
+        invaderProjectile.position.y + invaderProjectile.height >=
+        spaceCanvas.height
+      ) {
+        setTimeout(() => {
+          invaderProjectiles.splice(index, 1);
+        }, 0);
+      } else {
+        invaderProjectile.update({ spaceContext });
+      }
+      if (
+        invaderProjectile.position.y + invaderProjectile.height >=
+          player.position.y &&
+        invaderProjectile.position.x + invaderProjectile.width >=
+          player.position.x &&
+        invaderProjectile.position.x <= player.position.x + player.width
+      ) {
+        // projectile hits player
+        setTimeout(() => {
+          invaderProjectiles.splice(index, 1);
+          player.opacity = 0;
+          game.over = true;
+        }, 0);
+        setTimeout(() => {
+          game.active = false;
+        }, 2000);
+
+        console.log("player hit");
+        createParticles({
+          object: player,
+          color: "white",
+        });
+      }
+    });
+
+    projectiles.forEach((projectile, index) => {
+      if (projectile.position.y + projectile.radius <= 0) {
+        setTimeout(() => {
+          projectiles.splice(index, 1);
+        }, 0);
+      } else {
+        projectile.update({ spaceContext });
+      }
+    });
+
     grids.forEach((grid, gridIndex) => {
-      grid.update();
-      grid.invaders.forEach((invader, i) => {
-        invader.update({ velocity: grid.velocity });
+      grid.update({ spaceCanvas });
+
+      // spawn invader projectiles
+      if (frames % 100 === 0 && grid.invaders.length > 0) {
+        grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
+          invaderProjectiles
+        );
+      }
+
+      for (let i = grid.invaders.length - 1; i >= 0; i--) {
+        const invader = grid.invaders[i];
+        invader.update({ velocity: grid.velocity, spaceContext });
+
+        // projectiles hit enemy
         projectiles.forEach((projectile, j) => {
           if (
             projectile.position.y - projectile.radius <=
@@ -213,12 +152,19 @@ export function run() {
               );
               // remove invader and projectile
               if (invaderFound && projectileFound) {
+                // add score
+                score += 100;
+                scoreEl.innerHTML = score;
+                createParticles({
+                  object: invader,
+                });
+
                 grid.invaders.splice(i, 1);
                 projectiles.splice(j, 1);
 
                 if (grid.invaders.length > 0) {
                   const firstInvader = grid.invaders[0];
-                  const lastInvader = grid.invaders(grid.invaders.length - 1);
+                  const lastInvader = grid.invaders[grid.invaders.length - 1];
 
                   grid.width =
                     lastInvader.position.x -
@@ -232,18 +178,9 @@ export function run() {
             }, 0);
           }
         });
-      });
-    });
-    player.update();
-    projectiles.forEach((projectile, index) => {
-      if (projectile.position.y + projectile.radius <= 0) {
-        setTimeout(() => {
-          projectiles.splice(index, 1);
-        }, 0);
-      } else {
-        projectile.update();
       }
     });
+
     if (keys.a.pressed && player.position.x >= 0) {
       player.velocity.x = -player.speed;
       player.rotation = -0.15;
@@ -258,17 +195,21 @@ export function run() {
       player.velocity.x = 0;
       player.rotation = 0;
     }
+
+    // spawn enemies
     if (frames % randomInterval === 0) {
       grids.push(new Grid());
       randomInterval = Math.floor(Math.random() * 500 + 500);
       frames = 0;
     }
+
     frames++;
   }
 
   animate();
 
   addEventListener("keydown", ({ key }) => {
+    if (game.over) return;
     switch (key) {
       case "a":
         keys.a.pressed = true;

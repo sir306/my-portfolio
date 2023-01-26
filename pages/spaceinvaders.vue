@@ -1,5 +1,8 @@
 <template>
   <div style="position: relative">
+    <p id="scorePEl" class="font-ubuntu-mono">
+      <span>Score:</span> <span id="scoreEl">0</span>
+    </p>
     <canvas ref="canvas"></canvas>
     <canvas
       class="space"
@@ -83,8 +86,8 @@ export default {
 
       frame += 0.01;
 
-      stars.rotation.x += 0.0007;
-      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
+      stars.rotation.x -= 0.002;
+      stars.rotation.y += (Math.random() - 0.5) * 0.001;
     }
     animate();
 
@@ -135,3 +138,13 @@ export default {
   // render();
 };
 </script>
+<style>
+#scorePEl {
+  position: fixed;
+  z-index: 10;
+  color: white;
+  left: 2%;
+  top: 2%;
+  font-size: 14px;
+}
+</style>
