@@ -11,17 +11,24 @@ export function run() {
   spaceCanvas.width = innerWidth;
   spaceCanvas.height = innerHeight;
 
+  // get navbar
+  const navbar = document.getElementById("navbar");
+
   //get score point amount element
   const scoreEl = document.getElementById("scoreEl");
 
   // get the score p element
-  const scorePEl = document.getElementById("scorePEl")
-  // get pause and start menu
-  const pauseMenu = document.getElementById('pausedMenu')
-  const startMenu = document.getElementById('startMenu')
-  // get paused score element
-  const pausedScoreEl = document.getElementById('pausedScoreEl')
+  const scorePEl = document.getElementById("scorePEl");
 
+  // get pause, gameover and start menu
+  const pauseMenu = document.getElementById("pausedMenu");
+  const startMenu = document.getElementById("startMenu");
+  const gameoverMenu = document.getElementById("gameOverMenu");
+
+  // get paused score element
+  const pausedScoreEl = document.getElementById("pausedScoreEl");
+  // get the score gameover element
+  const scoreGameOverEL = document.getElementById("gameOverScoreEl");
 
   // create new player
   const player = new Player({ spaceCanvas });
@@ -49,7 +56,7 @@ export function run() {
   let game = {
     over: false,
     active: false,
-    newGame:false
+    newGame: false,
   };
   let score = 0;
 
@@ -73,6 +80,7 @@ export function run() {
       let lastGridInvaders = grids[grids.length - 1];
       // get top left invader and check to see if below screen - check position undefined first as value may not be assigned
       if (
+        lastGridInvaders.invaders.length > 0 &&
         lastGridInvaders.invaders[0].position !== undefined &&
         lastGridInvaders.invaders[0].position.y > 0
       ) {
@@ -84,8 +92,33 @@ export function run() {
     }
   }
 
+  // reset game
+  function resetGame() {
+    // splice existing data from arrays
+    particles.splice(0, particles.length);
+    grids.splice(0, grids.length);
+    projectiles.splice(0, projectiles.length);
+    invaderProjectiles.splice(0, invaderProjectiles.length);
+
+    // center player and opacity to 1
+    player.position.x = spaceCanvas.width / 2 - player.width / 2;
+    player.opacity = 1;
+
+    // reset score tag
+    scoreEl.innerHTML = 0;
+  }
+
+  // animate function
   function animate() {
-    if (!game.active) return;
+    // move navbar above screen if game active and move back if not
+    if (game.active) {
+      navbar.style.visibility = "hidden";
+    } else {
+      navbar.style.visibility = "visible";
+      // game not active return stop animating
+      return;
+    }
+
     requestAnimationFrame(animate);
     spaceContext.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
 
@@ -130,7 +163,12 @@ export function run() {
         setTimeout(() => {
           game.active = false;
         }, 2000);
-
+        // display menu
+        setTimeout(() => {
+          gameoverMenu.style.opacity = 1;
+        }, 2000);
+        // edit game over score
+        scoreGameOverEL.innerHTML = "Final Score: " + score;
         // destroy player
         createParticles({
           object: player,
@@ -236,14 +274,43 @@ export function run() {
 
   animate();
 
-  
   // function for pause opacity
-  const pauseOpacity = () => (game.active === true ? 1 : 0)
+  const pauseOpacity = () => (game.active === true ? 1 : 0);
   // function pause game
-  const pauseGame = () => (game.active === true ? false : true)
+  const pauseGame = () => (game.active === true ? false : true);
 
   addEventListener("keydown", ({ key }) => {
-    if (game.over) return;
+    if (game.over && key !== "Enter") return;
+    // check if key is enter and the request is a new game
+    else if (key === "Enter" && !game.newGame) {
+      // set the opacitys for a new game
+      scorePEl.style.opacity = 1;
+      startMenu.style.opacity = 0;
+      // set game settings
+      game.newGame = true;
+      game.active = true;
+      // start animate loop
+      animate();
+    }
+    // check to see if game restart
+    else if (key === "Enter" && game.newGame && !game.active && game.over) {
+      // hide game over menu
+      gameoverMenu.style.opacity = 0;
+      // reset score
+      score = 0;
+      // reset game
+      resetGame();
+
+      // set game settings
+      game.newGame = true;
+      game.active = true;
+      game.over = false;
+      // start animate loop
+      animate();
+    }
+    // check game not still over and another key pressed
+    else if (game.over) return;
+
     switch (key) {
       case "a":
         keys.a.pressed = true;
@@ -252,34 +319,26 @@ export function run() {
         keys.d.pressed = true;
         break;
       case " ":
+        if (!keys.space.pressed) {
+          projectiles.push(
+            new Projectile({
+              position: {
+                x: player.position.x + player.width / 2,
+                y: player.position.y,
+              },
+              velocity: {
+                x: 0,
+                y: -10,
+              },
+            })
+          );
+        }
         keys.space.pressed = true;
-        projectiles.push(
-          new Projectile({
-            position: {
-              x: player.position.x + player.width / 2,
-              y: player.position.y,
-            },
-            velocity: {
-              x: 0,
-              y: -10,
-            },
-          })
-        );
+
         break;
     }
   });
   addEventListener("keyup", ({ key }) => {
-    // check if key is enter and the request is a new game
-    if(key === 'Enter' && !game.newGame){
-      // set the opacitys for a new game
-      scorePEl.style.opacity = 1
-      startMenu.style.opacity = 0
-      // set game settings
-      game.newGame = true
-      game.active = true
-      // start animate loop
-      animate()
-    }
     switch (key) {
       case "a":
         keys.a.pressed = false;
@@ -291,11 +350,12 @@ export function run() {
         keys.space.pressed = false;
         break;
       case "Escape":
-        if(game.newGame ){
-          pauseMenu.style.opacity = pauseOpacity()
-          console.log(pauseGame())
-          game.active = pauseGame()
-          animate()
+        if (game.newGame && !game.over) {
+          pauseMenu.style.opacity = pauseOpacity();
+          pausedScoreEl.innerHTML = "Current Score: " + score;
+          console.log(pauseGame());
+          game.active = pauseGame();
+          animate();
         }
         break;
     }

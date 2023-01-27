@@ -3,6 +3,20 @@
     <p id="scorePEl" class="font-ubuntu-mono">
       <span>Score:</span> <span id="scoreEl">0</span>
     </p>
+    <div id="gameOverMenu">
+      <div>
+        <h2>Game Over</h2>
+        <hr style="margin-bottom: 1.2em" />
+        <p id="gameOverScoreEl">Final Score: 0</p>
+        <p>Press 'Enter' to Restart</p>
+        <h2 style="margin-top: 0.8em">The Controls</h2>
+        <hr style="margin-bottom: 1.2em" />
+        <p>Each Invader is worth 100 points</p>
+        <p>Press 'A' and 'D' to move left and right</p>
+        <p>Press 'Space' to shoot</p>
+        <p>Press 'Esc' to pause</p>
+      </div>
+    </div>
     <div id="pausedMenu">
       <div>
         <h2>Game Paused</h2>
@@ -114,7 +128,7 @@ export default {
     addEventListener("resize", () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(outerWidth, outerHeight);
+      renderer.setSize(innerWidth, innerHeight);
     });
   },
 
@@ -169,7 +183,8 @@ export default {
   opacity: 0;
 }
 #startMenu,
-#pausedMenu {
+#pausedMenu,
+#gameOverMenu {
   position: absolute;
   top: 50%;
   transform: translate(0, -50%);
@@ -178,7 +193,8 @@ export default {
   margin: auto;
 }
 #startMenu div,
-#pausedMenu div {
+#pausedMenu div,
+#gameOverMenu div {
   width: fit-content;
   margin: auto;
   padding: 0.8em 1.8em;
@@ -188,24 +204,29 @@ export default {
   background-color: #00000080;
 }
 #startMenu h2,
-#pausedMenu h2 {
+#pausedMenu h2,
+#gameOverMenu h2 {
   font-size: larger;
   font-weight: 800;
 }
 #startMenu p,
-#pausedMenu p {
+#pausedMenu p,
+#gameOverMenu p {
   font-weight: 500;
 }
 #startMenu h2,
 #startMenu p,
 #pausedMenu h2,
-#pausedMenu p {
+#pausedMenu p,
+#gameOverMenu h2,
+#gameOverMenu p {
   letter-spacing: 0.2em;
   margin: auto;
   color: white;
   text-align: center;
 }
-#pausedMenu {
+#pausedMenu,
+#gameOverMenu {
   opacity: 0;
 }
 </style>
