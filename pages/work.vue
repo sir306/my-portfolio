@@ -43,7 +43,6 @@ import fullstackImg from "~/assets/fullstack-projects.jpg";
 import mobileImg from "~/assets/mobile-projects.jpg";
 import randomImg from "~/assets/random-projects.jpg";
 import {
-  Raycaster,
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
@@ -127,8 +126,6 @@ export default {
       ease: "expo",
       delay: 0.2,
     });
-
-    const raycaster = new Raycaster();
     const scene = new Scene();
     const camera = new PerspectiveCamera(
       75,
@@ -139,7 +136,7 @@ export default {
     camera.position.z = 80;
 
     const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
-    renderer.setSize(outerWidth, outerHeight);
+    renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(devicePixelRatio);
 
     const light = new DirectionalLight(0xffffff, 1);
@@ -185,7 +182,7 @@ export default {
     addEventListener("resize", () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(outerWidth, outerHeight);
+      renderer.setSize(innerWidth, innerHeight);
     });
   },
 };

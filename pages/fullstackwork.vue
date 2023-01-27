@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas ref="canvas" style="display: block"></canvas>
+    <canvas ref="canvas"></canvas>
     <div
       id="container"
       class="absolute w-full px-3 md:px-6 my-2 overflow-y-auto h-4/5"
@@ -42,16 +42,9 @@
 import gsap from "gsap";
 import Project from "@/components/Project";
 import {
-  PlaneGeometry,
-  BufferAttribute,
-  Raycaster,
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
-  MeshPhongMaterial,
-  Mesh,
-  DoubleSide,
-  FlatShading,
   DirectionalLight,
   BufferGeometry,
   PointsMaterial,
@@ -88,7 +81,6 @@ export default {
       y: 0,
       ease: "expo",
     });
-    const raycaster = new Raycaster();
     const scene = new Scene();
     const camera = new PerspectiveCamera(
       75,
@@ -100,7 +92,7 @@ export default {
 
     const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
 
-    renderer.setSize(outerWidth, outerHeight);
+    renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(devicePixelRatio);
 
     const light = new DirectionalLight(0xffffff, 1);
@@ -146,7 +138,7 @@ export default {
     addEventListener("resize", () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(outerWidth, outerHeight);
+      renderer.setSize(innerWidth, innerHeight);
     });
   },
 };

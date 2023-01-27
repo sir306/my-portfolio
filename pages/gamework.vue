@@ -42,16 +42,9 @@ import gsap from "gsap";
 import Project from "@/components/Project";
 import { GameProjects } from "../data/gameprojects";
 import {
-  PlaneGeometry,
-  BufferAttribute,
-  Raycaster,
   Scene,
   PerspectiveCamera,
   WebGLRenderer,
-  MeshPhongMaterial,
-  Mesh,
-  DoubleSide,
-  FlatShading,
   DirectionalLight,
   BufferGeometry,
   PointsMaterial,
@@ -87,7 +80,6 @@ export default {
       y: 0,
       ease: "expo",
     });
-    const raycaster = new Raycaster();
     const scene = new Scene();
     const camera = new PerspectiveCamera(
       75,
@@ -99,7 +91,7 @@ export default {
 
     const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
 
-    renderer.setSize(outerWidth, outerHeight);
+    renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(devicePixelRatio);
 
     const light = new DirectionalLight(0xffffff, 1);
@@ -145,7 +137,7 @@ export default {
     addEventListener("resize", () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(outerWidth, outerHeight);
+      renderer.setSize(innerWidth, innerHeight);
     });
   },
 };
