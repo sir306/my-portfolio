@@ -193,6 +193,7 @@ export function run() {
 
       // spawn invader projectiles
       if (frames % 100 === 0 && grid.invaders.length > 0) {
+        // are invaders in view of screen
         if (grid.invaders[grid.invaders.length - 1].position.y > 0) {
           invaderShoots(grid);
         }
@@ -224,11 +225,11 @@ export function run() {
                 // add score
                 score += 100;
                 scoreEl.innerHTML = score;
+                // create particle explosion on invader
                 createParticles({
                   object: invader,
                   particles,
                 });
-
                 grid.invaders.splice(i, 1);
                 projectiles.splice(j, 1);
 
@@ -241,9 +242,9 @@ export function run() {
                     firstInvader.position.x +
                     lastInvader.width;
                   grid.position.x = firstInvader.position.x;
+                } else {
+                  grids.splice(gridIndex, 1);
                 }
-              } else {
-                grids.splice(gridIndex, 1);
               }
             }, 0);
           }
