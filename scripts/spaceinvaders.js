@@ -14,6 +14,15 @@ export function run() {
   //get score point amount element
   const scoreEl = document.getElementById("scoreEl");
 
+  // get the score p element
+  const scorePEl = document.getElementById("scorePEl")
+  // get pause and start menu
+  const pauseMenu = document.getElementById('pausedMenu')
+  const startMenu = document.getElementById('startMenu')
+  // get paused score element
+  const pausedScoreEl = document.getElementById('pausedScoreEl')
+
+
   // create new player
   const player = new Player({ spaceCanvas });
   // create const arrays for projectiles, grids, invaderProjectiles and particles
@@ -37,11 +46,10 @@ export function run() {
 
   // create frames
   let frames = 0;
-  // random spawn interval for invaders
-  let randomInterval = Math.floor(Math.random() * 500 + 500);
   let game = {
     over: false,
-    active: true,
+    active: false,
+    newGame:false
   };
   let score = 0;
 
@@ -228,6 +236,12 @@ export function run() {
 
   animate();
 
+  
+  // function for pause opacity
+  const pauseOpacity = () => (game.active === true ? 1 : 0)
+  // function pause game
+  const pauseGame = () => (game.active === true ? false : true)
+
   addEventListener("keydown", ({ key }) => {
     if (game.over) return;
     switch (key) {
@@ -255,6 +269,17 @@ export function run() {
     }
   });
   addEventListener("keyup", ({ key }) => {
+    // check if key is enter and the request is a new game
+    if(key === 'Enter' && !game.newGame){
+      // set the opacitys for a new game
+      scorePEl.style.opacity = 1
+      startMenu.style.opacity = 0
+      // set game settings
+      game.newGame = true
+      game.active = true
+      // start animate loop
+      animate()
+    }
     switch (key) {
       case "a":
         keys.a.pressed = false;
@@ -264,6 +289,14 @@ export function run() {
         break;
       case " ":
         keys.space.pressed = false;
+        break;
+      case "Escape":
+        if(game.newGame ){
+          pauseMenu.style.opacity = pauseOpacity()
+          console.log(pauseGame())
+          game.active = pauseGame()
+          animate()
+        }
         break;
     }
   });

@@ -3,13 +3,25 @@
     <p id="scorePEl" class="font-ubuntu-mono">
       <span>Score:</span> <span id="scoreEl">0</span>
     </p>
-    <div id="pauseMenu"></div>
+    <div id="pausedMenu">
+      <div>
+        <h2>Game Paused</h2>
+        <hr style="margin-bottom: 1.2em" />
+        <p id="pausedScoreEl">Current Score: 0</p>
+        <p>Press 'Esc' to Resume</p>
+      </div>
+    </div>
     <div id="startMenu">
-      <h4>The Controls:</h4>
-      <p>Press 'A' and 'D' to move left and right</p>
-      <p>Press 'Space' to shoot</p>
-      <p>Press 'Esc' to pause</p>
-      <p>Good luck and enjoy, press 'Enter' to start!</p>
+      <div>
+        <h2>The Controls</h2>
+        <hr style="margin-bottom: 1.2em" />
+        <p>Destroy as many Invaders as you can!</p>
+        <p>Each Invader is worth 100 points</p>
+        <p>Press 'A' and 'D' to move left and right</p>
+        <p>Press 'Space' to shoot</p>
+        <p>Press 'Esc' to pause</p>
+        <p>Good luck and enjoy, Press 'Enter' to start!</p>
+      </div>
     </div>
     <canvas ref="canvas"></canvas>
     <canvas
@@ -154,5 +166,46 @@ export default {
   left: 2%;
   top: 2%;
   font-size: 14px;
+  opacity: 0;
+}
+#startMenu,
+#pausedMenu {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 100%;
+  z-index: 50;
+  margin: auto;
+}
+#startMenu div,
+#pausedMenu div {
+  width: fit-content;
+  margin: auto;
+  padding: 0.8em 1.8em;
+  padding-bottom: 1.2em;
+  border: 0.4em solid white;
+  border-radius: 15%;
+  background-color: #00000080;
+}
+#startMenu h2,
+#pausedMenu h2 {
+  font-size: larger;
+  font-weight: 800;
+}
+#startMenu p,
+#pausedMenu p {
+  font-weight: 500;
+}
+#startMenu h2,
+#startMenu p,
+#pausedMenu h2,
+#pausedMenu p {
+  letter-spacing: 0.2em;
+  margin: auto;
+  color: white;
+  text-align: center;
+}
+#pausedMenu {
+  opacity: 0;
 }
 </style>
