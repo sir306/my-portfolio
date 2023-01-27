@@ -1,5 +1,5 @@
 import { Player } from "./game/classes/Player";
-import { Particle } from "./game/classes/Particle";
+import { createParticles } from "./game/methods/CreateParticle";
 import { Grid } from "./game/classes/Grid";
 import { Projectile } from "./game/classes/Projectile";
 
@@ -36,25 +36,6 @@ export function run() {
     active: true,
   };
   let score = 0;
-
-  function createParticles({ object, color }) {
-    for (let i = 0; i < 15; i++) {
-      particles.push(
-        new Particle({
-          position: {
-            x: object.position.x + object.width / 2,
-            y: object.position.y + object.height / 2,
-          },
-          velocity: {
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2,
-          },
-          radius: Math.random() * 3,
-          color: color || "#BAA0DE",
-        })
-      );
-    }
-  }
 
   function animate() {
     if (!game.active) return;
@@ -105,6 +86,7 @@ export function run() {
         createParticles({
           object: player,
           color: "white",
+          particles,
         });
       }
     });
@@ -157,6 +139,7 @@ export function run() {
                 scoreEl.innerHTML = score;
                 createParticles({
                   object: invader,
+                  particles,
                 });
 
                 grid.invaders.splice(i, 1);
