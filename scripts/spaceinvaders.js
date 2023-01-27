@@ -4,19 +4,25 @@ import { Grid } from "./game/classes/Grid";
 import { Projectile } from "./game/classes/Projectile";
 
 export function run() {
+  // get canvas and 2d context
   const spaceCanvas = document.getElementById("space-canvas");
   const spaceContext = spaceCanvas.getContext("2d");
-
+  // set dimensions of width and height of game
   spaceCanvas.width = innerWidth;
   spaceCanvas.height = innerHeight;
+
+  //get score point amount element
   const scoreEl = document.getElementById("scoreEl");
 
+  // create new player
   const player = new Player({ spaceCanvas });
+  // create const arrays for projectiles, grids, invaderProjectiles and particles
   const projectiles = [];
   const grids = [];
   const invaderProjectiles = [];
   const particles = [];
 
+  // create key binding
   const keys = {
     a: {
       pressed: false,
@@ -29,13 +35,46 @@ export function run() {
     },
   };
 
+  // create frames
   let frames = 0;
+  // random spawn interval for invaders
   let randomInterval = Math.floor(Math.random() * 500 + 500);
   let game = {
     over: false,
     active: true,
   };
   let score = 0;
+
+  // function for invaders to shoot
+  function invaderShoots(grid) {
+    // select an invader
+    let selectedInvader =
+      grid.invaders[Math.floor(Math.random() * grid.invaders.length)];
+    // if selectedInvaders position is greater than 0 then they can shoot otherwise call invaderShoots again till one does
+    if (selectedInvader.position.y > 0) {
+      selectedInvader.shoot(invaderProjectiles);
+    } else {
+      invaderShoots(grid);
+    }
+  }
+
+  // function for spawning invaders
+  function spawnInvaders() {
+    if (grids.length > 0) {
+      // get last grid of invaders
+      let lastGridInvaders = grids[grids.length - 1];
+      // get top left invader and check to see if below screen - check position undefined first as value may not be assigned
+      if (
+        lastGridInvaders.invaders[0].position !== undefined &&
+        lastGridInvaders.invaders[0].position.y > 0
+      ) {
+        grids.push(new Grid());
+      }
+    } else {
+      // no invader grids spawn one
+      grids.push(new Grid());
+    }
+  }
 
   function animate() {
     if (!game.active) return;
@@ -65,6 +104,7 @@ export function run() {
       } else {
         invaderProjectile.update({ spaceContext });
       }
+      // invader projectile hit player?
       if (
         invaderProjectile.position.y + invaderProjectile.height >=
           player.position.y &&
@@ -78,11 +118,12 @@ export function run() {
           player.opacity = 0;
           game.over = true;
         }, 0);
+        //pause animations
         setTimeout(() => {
           game.active = false;
         }, 2000);
 
-        console.log("player hit");
+        // destroy player
         createParticles({
           object: player,
           color: "white",
@@ -106,9 +147,9 @@ export function run() {
 
       // spawn invader projectiles
       if (frames % 100 === 0 && grid.invaders.length > 0) {
-        grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
-          invaderProjectiles
-        );
+        if (grid.invaders[grid.invaders.length - 1].position.y > 0) {
+          invaderShoots(grid);
+        }
       }
 
       for (let i = grid.invaders.length - 1; i >= 0; i--) {
@@ -180,11 +221,7 @@ export function run() {
     }
 
     // spawn enemies
-    if (frames % randomInterval === 0) {
-      grids.push(new Grid());
-      randomInterval = Math.floor(Math.random() * 500 + 500);
-      frames = 0;
-    }
+    spawnInvaders();
 
     frames++;
   }

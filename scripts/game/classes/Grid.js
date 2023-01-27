@@ -22,7 +22,7 @@ export class Grid {
           new Invader({
             position: {
               x: x * 40,
-              y: y * 40,
+              y: y * 40 - rows * 40, // row * 40 spawns invaders above screen
             },
           })
         );
@@ -41,7 +41,7 @@ export class Grid {
       this.position.x <= 0
     ) {
       this.velocity.x = -this.velocity.x;
-      this.velocity.y = 30;
+      this.velocity.y = 40;
     }
   }
 }
