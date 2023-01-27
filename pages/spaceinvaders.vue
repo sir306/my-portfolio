@@ -3,6 +3,14 @@
     <p id="scorePEl" class="font-ubuntu-mono">
       <span>Score:</span> <span id="scoreEl">0</span>
     </p>
+    <div id="pauseMenu"></div>
+    <div id="startMenu">
+      <h4>The Controls:</h4>
+      <p>Press 'A' and 'D' to move left and right</p>
+      <p>Press 'Space' to shoot</p>
+      <p>Press 'Esc' to pause</p>
+      <p>Good luck and enjoy, press 'Enter' to start!</p>
+    </div>
     <canvas ref="canvas"></canvas>
     <canvas
       class="space"
