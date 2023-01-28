@@ -7,6 +7,7 @@
       <div>
         <h2>Game Over</h2>
         <hr style="margin-bottom: 1.2em" />
+        <p id="gameOverReasonEl">Reason</p>
         <p id="gameOverScoreEl">Final Score: 0</p>
         <p>Press 'Enter' to Restart</p>
         <h2 style="margin-top: 0.8em">The Controls</h2>

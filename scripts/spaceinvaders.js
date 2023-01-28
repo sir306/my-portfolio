@@ -29,6 +29,8 @@ export function run() {
   const pausedScoreEl = document.getElementById("pausedScoreEl");
   // get the score gameover element
   const scoreGameOverEL = document.getElementById("gameOverScoreEl");
+  // get gameoverReason element
+  const gameOverReasonEl = document.getElementById("gameOverReasonEl");
 
   // create new player
   const player = new Player({ spaceCanvas });
@@ -169,6 +171,9 @@ export function run() {
         }, 2000);
         // edit game over score
         scoreGameOverEL.innerHTML = "Final Score: " + score;
+        // edit game over reason
+        gameOverReasonEl.innerHTML =
+          "You were destroyed by an invader projectile!";
         // destroy player
         createParticles({
           object: player,
@@ -195,13 +200,25 @@ export function run() {
       if (frames % 100 === 0 && grid.invaders.length > 0) {
         // are invaders in view of screen
         if (grid.invaders[grid.invaders.length - 1].position.y > 0) {
-          invaderShoots(grid);
+          //invaderShoots(grid);
         }
       }
 
       for (let i = grid.invaders.length - 1; i >= 0; i--) {
         const invader = grid.invaders[i];
         invader.update({ velocity: grid.velocity, spaceContext });
+
+        // are invaders inline with player or past them if so loose
+        if (
+          grid.invaders[grid.invaders.length - 1].position !== undefined &&
+          grid.invaders[grid.invaders.length - 1].position.y + invader.height >=
+            player.position.y
+        ) {
+          console.log(player.position);
+          console.log(invader.position);
+          console.log(invader.height);
+          console.log("out of bounds");
+        }
 
         // projectiles hit enemy
         projectiles.forEach((projectile, j) => {
