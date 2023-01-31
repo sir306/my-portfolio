@@ -28,6 +28,9 @@
     </div>
     <div id="startMenu">
       <div>
+        <!-- <audio id="backgroundMusic" autoplay loop>
+          <source :src="backgroundMusic" type="audio/wav" />
+        </audio> -->
         <h2>The Controls</h2>
         <hr style="margin-bottom: 1.2em" />
         <p>Destroy as many Invaders as you can!</p>
@@ -51,6 +54,7 @@
 // import * as THREE from "three";
 // import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { run } from "../scripts/spaceinvaders";
+import backgroundMusic from "~/assets/audio/backgroundMusic.wav";
 import {
   PlaneGeometry,
   BufferAttribute,
@@ -69,7 +73,15 @@ import {
   Points,
 } from "three";
 export default {
+  data() {
+    return {
+      backgroundMusic: backgroundMusic,
+    };
+  },
   mounted() {
+    var backgroundAudio = new Audio(backgroundMusic);
+    backgroundAudio.loop = true;
+    backgroundAudio.play();
     run();
     const raycaster = new Raycaster();
     const scene = new Scene();
@@ -202,7 +214,7 @@ export default {
   padding-bottom: 1.2em;
   border: 0.4em solid white;
   border-radius: 15%;
-  background-color: #00000080;
+  background-color: #000000c4;
 }
 #startMenu h2,
 #pausedMenu h2,

@@ -11,6 +11,10 @@ export function run() {
   spaceCanvas.width = innerWidth;
   spaceCanvas.height = innerHeight;
 
+  // get audio
+  // const backgroundMusic = document.getElementById("backgroundMusic");
+  // backgroundMusic.play();
+
   // get navbar
   const navbar = document.getElementById("navbar");
 
@@ -110,6 +114,42 @@ export function run() {
     scoreEl.innerHTML = 0;
   }
 
+  // game over function
+  function gameOver(reason, timeout) {
+    //pause animations
+    setTimeout(() => {
+      game.active = false;
+    }, timeout);
+    // display menu
+    setTimeout(() => {
+      gameoverMenu.style.opacity = 1;
+    }, timeout);
+    // destroy player explosion
+    createParticles({
+      object: player,
+      color: "white",
+      particles,
+    });
+    // destroy player explosion
+    createParticles({
+      object: player,
+      color: "red",
+      particles,
+    });
+    // destroy player explosion
+    createParticles({
+      object: player,
+      color: "yellow",
+      particles,
+    });
+
+    game.over = true;
+    // edit game over score
+    scoreGameOverEL.innerHTML = "Final Score: " + score;
+    // edit game over reason
+    gameOverReasonEl.innerHTML = reason;
+  }
+
   // animate function
   function animate() {
     // move navbar above screen if game active and move back if not
@@ -161,25 +201,7 @@ export function run() {
           player.opacity = 0;
           game.over = true;
         }, 0);
-        //pause animations
-        setTimeout(() => {
-          game.active = false;
-        }, 2000);
-        // display menu
-        setTimeout(() => {
-          gameoverMenu.style.opacity = 1;
-        }, 2000);
-        // edit game over score
-        scoreGameOverEL.innerHTML = "Final Score: " + score;
-        // edit game over reason
-        gameOverReasonEl.innerHTML =
-          "You were destroyed by an invader projectile!";
-        // destroy player
-        createParticles({
-          object: player,
-          color: "white",
-          particles,
-        });
+        gameOver("You were destroyed by an invader projectile!", 2000);
       }
     });
 
@@ -200,7 +222,20 @@ export function run() {
       if (frames % 100 === 0 && grid.invaders.length > 0) {
         // are invaders in view of screen
         if (grid.invaders[grid.invaders.length - 1].position.y > 0) {
-          //invaderShoots(grid);
+          invaderShoots(grid);
+        }
+      }
+
+      // check grid has invaders before getting lowest invader and check is inline with player
+      if (grid.invaders.length > 0) {
+        // get lowest invader
+        const lowestInvader = Math.max(
+          ...grid.invaders.map((invader) => invader.position?.y + 40),
+          0
+        );
+        // are invaders inline with player or past them if so loose
+        if (lowestInvader >= player.position.y) {
+          gameOver("You let the invaders get past you!", 500);
         }
       }
 
@@ -208,20 +243,9 @@ export function run() {
         const invader = grid.invaders[i];
         invader.update({ velocity: grid.velocity, spaceContext });
 
-        // are invaders inline with player or past them if so loose
-        if (
-          grid.invaders[grid.invaders.length - 1].position !== undefined &&
-          grid.invaders[grid.invaders.length - 1].position.y + invader.height >=
-            player.position.y
-        ) {
-          console.log(player.position);
-          console.log(invader.position);
-          console.log(invader.height);
-          console.log("out of bounds");
-        }
-
-        // projectiles hit enemy
+        // loop through projectile array
         projectiles.forEach((projectile, j) => {
+          // did projectile hit an enemy
           if (
             projectile.position.y - projectile.radius <=
               invader.position.y + invader.height &&
@@ -230,10 +254,12 @@ export function run() {
               invader.position.x + invader.width &&
             projectile.position.y + projectile.radius >= invader.position.y
           ) {
+            // find invader to splice
             setTimeout(() => {
               const invaderFound = grid.invaders.find(
                 (invader2) => invader2 === invader
               );
+              // find projectile to splice
               const projectileFound = projectiles.find(
                 (projectile2) => projectile2 === projectile
               );
@@ -247,9 +273,11 @@ export function run() {
                   object: invader,
                   particles,
                 });
+                // splice invader and projectile
                 grid.invaders.splice(i, 1);
                 projectiles.splice(j, 1);
 
+                // resize grid if invaders left
                 if (grid.invaders.length > 0) {
                   const firstInvader = grid.invaders[0];
                   const lastInvader = grid.invaders[grid.invaders.length - 1];
@@ -259,7 +287,9 @@ export function run() {
                     firstInvader.position.x +
                     lastInvader.width;
                   grid.position.x = firstInvader.position.x;
-                } else {
+                }
+                // no invaders left splice grid
+                else {
                   grids.splice(gridIndex, 1);
                 }
               }
@@ -296,6 +326,13 @@ export function run() {
   const pauseOpacity = () => (game.active === true ? 1 : 0);
   // function pause game
   const pauseGame = () => (game.active === true ? false : true);
+
+  // event listners
+  addEventListener("resize", () => {
+    // set dimensions of width and height of game
+    spaceCanvas.width = innerWidth;
+    spaceCanvas.height = innerHeight;
+  });
 
   addEventListener("keydown", ({ key }) => {
     if (game.over && key !== "Enter") return;
