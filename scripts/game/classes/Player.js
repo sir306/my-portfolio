@@ -8,7 +8,7 @@ export class Player {
     this.rotation = 0;
     this.opacity = 1;
     const image = new Image();
-    image.src = "./spaceship.png";
+    image.src = "../spaceship.png";
     image.onload = () => {
       this.image = image;
       const scale = 0.15;

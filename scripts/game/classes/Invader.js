@@ -7,7 +7,7 @@ export class Invader {
     };
     this.speed = 7;
     const image = new Image();
-    image.src = "./invader.png";
+    image.src = "../invader.png";
     image.onload = () => {
       this.image = image;
       const scale = 1;
