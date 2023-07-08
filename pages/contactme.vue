@@ -36,7 +36,14 @@
             My profiles and channels
           </p>
         </div>
-        <div class="justify-self-center">
+        <div class="justify-self-center max-w-4xl">
+          <p class="py-2">
+            <a
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              href="https://github.com/sir306"
+              >GitHub Profile</a
+            >
+          </p>
           <p class="py-2">
             <a
               class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
