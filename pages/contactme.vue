@@ -73,7 +73,6 @@
             method="POST"
             action="/contactmesuccess"
             data-netlify="true"
-            style="transform: translateY(60px)"
           >
             <input type="hidden" name="form-name" value="contact" />
             <label
