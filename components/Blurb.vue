@@ -1,3 +1,22 @@
+<script setup>
+import { onMounted, ref } from 'vue'
+import gsap from 'gsap'
+
+const props = defineProps(['paragraph'])
+const blurb = ref(null)
+
+onMounted(() => {
+  gsap.to(blurb.value, {
+    opacity: 1,
+    duration: 3,
+    x: 1,
+    y: 0,
+    stagger: 0.4,
+    ease: "expo",
+  })
+})
+</script>
+
 <template>
   <div
     ref="blurb"
@@ -14,21 +33,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import gsap from "gsap";
-export default {
-  props: ["paragraph"],
-  mounted() {
-    // this gsap is to return to origin i.e., the center of the screen
-    gsap.to(this.$refs.blurb, {
-      opacity: 1,
-      duration: 3,
-      x: 1,
-      y: 0,
-      stagger: 0.4,
-      ease: "expo",
-    });
-  },
-};
-</script>

@@ -3,7 +3,7 @@ export class Projectile {
     this.position = position;
     this.velocity = velocity;
 
-    this.radius = 4;
+    this.radius = 6;
   }
 
   draw({ spaceContext }) {
@@ -15,7 +15,7 @@ export class Projectile {
       0,
       Math.PI * 2
     );
-    spaceContext.fillStyle = "red";
+    spaceContext.fillStyle = "cyan";
     spaceContext.fill();
     spaceContext.closePath();
   }

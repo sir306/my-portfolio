@@ -6,14 +6,12 @@ import { Projectile } from "./game/classes/Projectile";
 export function run() {
   // get canvas and 2d context
   const spaceCanvas = document.getElementById("space-canvas");
+  if (!spaceCanvas) return; // Guard clause
+  
   const spaceContext = spaceCanvas.getContext("2d");
   // set dimensions of width and height of game
   spaceCanvas.width = innerWidth;
   spaceCanvas.height = innerHeight;
-
-  // get audio
-  // const backgroundMusic = document.getElementById("backgroundMusic");
-  // backgroundMusic.play();
 
   // get navbar
   const navbar = document.getElementById("navbar");
@@ -35,6 +33,10 @@ export function run() {
   const scoreGameOverEL = document.getElementById("gameOverScoreEl");
   // get gameoverReason element
   const gameOverReasonEl = document.getElementById("gameOverReasonEl");
+
+  // Loop control
+  let isRunning = true;
+  let animationId = null;
 
   // create new player
   const player = new Player({ spaceCanvas });
@@ -111,7 +113,7 @@ export function run() {
     player.opacity = 1;
 
     // reset score tag
-    scoreEl.innerHTML = 0;
+    scoreEl.textContent = 0;
   }
 
   // game over function
@@ -145,23 +147,25 @@ export function run() {
 
     game.over = true;
     // edit game over score
-    scoreGameOverEL.innerHTML = "Final Score: " + score;
+    scoreGameOverEL.textContent = "Final Score: " + score;
     // edit game over reason
-    gameOverReasonEl.innerHTML = reason;
+    gameOverReasonEl.textContent = reason;
   }
 
   // animate function
   function animate() {
+    if (!isRunning) return;
+
     // move navbar above screen if game active and move back if not
     if (game.active) {
       navbar.style.visibility = "hidden";
     } else {
       navbar.style.visibility = "visible";
       // game not active return stop animating
-      return;
+      if(!game.newGame) return; // Only return if we haven't started a new game yet
     }
 
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
     spaceContext.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
 
     player.update({ spaceContext, player });
@@ -267,11 +271,12 @@ export function run() {
               if (invaderFound && projectileFound) {
                 // add score
                 score += 100;
-                scoreEl.innerHTML = score;
+                scoreEl.textContent = score;
                 // create particle explosion on invader
                 createParticles({
                   object: invader,
                   particles,
+                  color: `hsl(${Math.random() * 360}, 50%, 50%)`
                 });
                 // splice invader and projectile
                 grid.invaders.splice(i, 1);
@@ -328,13 +333,13 @@ export function run() {
   const pauseGame = () => (game.active === true ? false : true);
 
   // event listners
-  addEventListener("resize", () => {
+  const onResize = () => {
     // set dimensions of width and height of game
     spaceCanvas.width = innerWidth;
     spaceCanvas.height = innerHeight;
-  });
+  };
 
-  addEventListener("keydown", ({ key }) => {
+  const onKeyDown = ({ key }) => {
     if (game.over && key !== "Enter") return;
     // check if key is enter and the request is a new game
     else if (key === "Enter" && !game.newGame) {
@@ -392,8 +397,9 @@ export function run() {
 
         break;
     }
-  });
-  addEventListener("keyup", ({ key }) => {
+  };
+
+  const onKeyUp = ({ key }) => {
     switch (key) {
       case "a":
         keys.a.pressed = false;
@@ -407,12 +413,28 @@ export function run() {
       case "Escape":
         if (game.newGame && !game.over) {
           pauseMenu.style.opacity = pauseOpacity();
-          pausedScoreEl.innerHTML = "Current Score: " + score;
+          pausedScoreEl.textContent = "Current Score: " + score;
           console.log(pauseGame());
           game.active = pauseGame();
           animate();
         }
         break;
     }
-  });
+  };
+
+  addEventListener("resize", onResize);
+  addEventListener("keydown", onKeyDown);
+  addEventListener("keyup", onKeyUp);
+
+  // Cleanup function to return
+  return function cleanup() {
+      isRunning = false;
+      if (animationId) cancelAnimationFrame(animationId);
+      removeEventListener("resize", onResize);
+      removeEventListener("keydown", onKeyDown);
+      removeEventListener("keyup", onKeyUp);
+      
+      // Force navbar visible in case we leave while game is active
+      if(navbar) navbar.style.visibility = "visible";
+  };
 }

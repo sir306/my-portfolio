@@ -1,3 +1,129 @@
+<script setup>
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+import gsap from 'gsap'
+import { cleanupScene } from '~/utils/threeHelper'
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  DirectionalLight,
+  BufferGeometry,
+  PointsMaterial,
+  Float32BufferAttribute,
+  Points,
+} from "three";
+
+// refs
+const canvas = ref(null)
+const title = ref(null)
+const titleLine = ref(null)
+const formLine = ref(null)
+const endLine = ref(null)
+
+let renderer = null
+let scene = null
+let animationId = null
+let camera = null
+
+function onWindowResize() {
+  if (camera && renderer) {
+    camera.aspect = innerWidth / innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(innerWidth, innerHeight)
+  }
+}
+
+onMounted(() => {
+    if(!process.client) return
+    scene = new Scene();
+    camera = new PerspectiveCamera(
+      75,
+      innerWidth / innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 80;
+
+    renderer = new WebGLRenderer({ canvas: canvas.value, powerPreference: "high-performance" });
+
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const light = new DirectionalLight(0xffffff, 1);
+    light.position.set(0, 1, 1);
+    scene.add(light);
+
+    const backLight = new DirectionalLight(0x11ffff, 1);
+    backLight.position.set(0, 0, -1);
+    scene.add(backLight);
+
+    const starGeometry = new BufferGeometry();
+    const starMaterial = new PointsMaterial({ color: 0xffffff });
+    const starVertices = [];
+
+    // Reduced star count for performance
+    for (let i = 0; i < 5000; i++) {
+        const x = (Math.random() - 0.5) * 2000;
+        const y = (Math.random() - 0.5) * 2000;
+        const z = (Math.random() - 0.5) * 2000;
+        starVertices.push(x, y, z);
+    }
+
+    starGeometry.setAttribute(
+      "position",
+      new Float32BufferAttribute(starVertices, 3)
+    );
+
+    const stars = new Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    let frame = 0;
+
+    function animate() {
+      animationId = requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+
+      frame += 0.01;
+
+      stars.rotation.x += 0.0007;
+      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
+    }
+    animate();
+
+    window.addEventListener("resize", onWindowResize);
+
+    gsap.to(title.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(titleLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(formLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(endLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+});
+
+onBeforeUnmount(() => {
+    cleanupScene(scene, renderer, animationId)
+    window.removeEventListener("resize", onWindowResize);
+});
+</script>
+
 <template>
   <div>
     <canvas ref="canvas"></canvas>
@@ -47,8 +173,8 @@
           <p class="py-2">
             <a
               class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
-              href="https://www.youtube.com/channel/UCGYiCTWIWc5LFNIbw02PizA"
-              >YouTube Channel</a
+              href="https://github.com/sir306"
+              >GitHub</a
             >
           </p>
         </div>
@@ -65,62 +191,77 @@
             Contact Form
           </p>
         </div>
-        <div class="justify-self-center">
-          <!-- form start -->
-          <form
-            class="grid grid-cols-3 gap-6"
-            name="contact"
-            method="POST"
-            action="/contactmesuccess"
-            data-netlify="true"
-            style="transform: translateY(60px)"
-          >
-            <input type="hidden" name="form-name" value="contact" />
-            <label
-              for="name"
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Your Name:</label
+          <div class="backdrop-blur-md bg-white/10 p-8 rounded-xl border border-white/20 shadow-2xl max-w-4xl mx-auto w-full">
+            <h3 class="text-white font-exo2 text-2xl uppercase mb-6 text-center tracking-widest border-b border-white/20 pb-4">
+              Send me a message
+            </h3>
+            <form
+              class="flex flex-col gap-6"
+              name="contact"
+              method="POST"
+              action="/contactmesuccess"
+              data-netlify="true"
             >
-            <input
-              class="col-span-2 p-1 text-black text-sm rounded-sm md:text-lg font-exo2 tracking-wider"
-              type="text"
-              name="name"
-              placeholder="Tell me who you are.."
-              required
-            />
-            <label
-              for="email"
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Your Email:</label
-            >
-            <input
-              class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
-              type="email"
-              name="email"
-              placeholder="Enter your email here.."
-              required
-            />
+              <input type="hidden" name="form-name" value="contact" />
+              
+              <div class="group relative">
+                <input
+                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Name"
+                  required
+                />
+                <label
+                  for="name"
+                  class="absolute left-2 -top-3.5 text-cyan-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-white/70 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-cyan-400 font-exo2 uppercase tracking-wide cursor-text"
+                >
+                  Your Name
+                </label>
+              </div>
 
-            <label
-              class="col-span-1 text-white text-sm md:text-lg font-exo2 tracking-wider"
-              >Message:</label
-            >
-            <textarea
-              class="col-span-2 p-1 text-black rounded-sm text-sm md:text-lg font-exo2 tracking-wider"
-              name="message"
-              required
-            >
-Say hello to me..</textarea
-            >
+              <div class="group relative">
+                <input
+                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                />
+                <label
+                  for="email"
+                  class="absolute left-2 -top-3.5 text-cyan-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-white/70 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-cyan-400 font-exo2 uppercase tracking-wide cursor-text"
+                >
+                  Your Email
+                </label>
+              </div>
 
-            <button
-              class="col-start-2 col-span-1 border-solid border-2 py-1 px-4 rounded-md border-white text-white text-sm md:text-lg font-exo2 tracking-wider hover:bg-white hover:text-gray-800"
-              type="submit"
-            >
-              Send
-            </button>
-          </form>
-        </div>
+              <div class="group relative">
+                <textarea
+                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300 min-h-[120px]"
+                  name="message"
+                  id="message"
+                  placeholder="Message"
+                  required
+                ></textarea>
+                <label
+                  for="message"
+                  class="absolute left-2 -top-3.5 text-cyan-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-white/70 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-cyan-400 font-exo2 uppercase tracking-wide cursor-text"
+                >
+                  Message
+                </label>
+              </div>
+
+              <button
+                class="self-center mt-4 border-2 border-white text-white font-ubuntu-mono text-xl uppercase px-12 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 active:scale-95"
+                type="submit"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
         <hr
           ref="endLine"
           class="opacity-0 mb-5 mt-5"
@@ -130,108 +271,3 @@ Say hello to me..</textarea
     </div>
   </div>
 </template>
-
-<script>
-import gsap from "gsap";
-import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
-  DirectionalLight,
-  BufferGeometry,
-  PointsMaterial,
-  Float32BufferAttribute,
-  Points,
-} from "three";
-
-export default {
-  mounted() {
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
-      75,
-      innerWidth / innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 80;
-
-    const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
-
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(devicePixelRatio);
-
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(0, 1, 1);
-    scene.add(light);
-
-    const backLight = new DirectionalLight(0x11ffff, 1);
-    backLight.position.set(0, 0, -1);
-    scene.add(backLight);
-
-    const starGeometry = new BufferGeometry();
-    const starMaterial = new PointsMaterial({ color: 0xffffff });
-    const starVertices = [];
-
-    for (let i = 0; i < 10000; i++) {
-      const x = (Math.random() - 0.5) * 2000;
-      const y = (Math.random() - 0.5) * 2000;
-      const z = (Math.random() - 0.5) * 2000;
-      starVertices.push(x, y, z);
-    }
-
-    starGeometry.setAttribute(
-      "position",
-      new Float32BufferAttribute(starVertices, 3)
-    );
-
-    const stars = new Points(starGeometry, starMaterial);
-    scene.add(stars);
-
-    let frame = 0;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-
-      frame += 0.01;
-
-      stars.rotation.x += 0.0007;
-      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
-    }
-    animate();
-
-    addEventListener("resize", () => {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-
-    // GSAP animations to various parts of the page
-    gsap.to(this.$refs.title, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    // lines
-    gsap.to(this.$refs.titleLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.formLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.endLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-  },
-};
-</script>

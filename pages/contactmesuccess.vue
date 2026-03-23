@@ -1,3 +1,113 @@
+<script setup>
+import { onMounted, ref } from 'vue'
+import gsap from 'gsap'
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  DirectionalLight,
+  BufferGeometry,
+  PointsMaterial,
+  Float32BufferAttribute,
+  Points,
+} from "three";
+
+const canvas = ref(null)
+const title = ref(null)
+const titleLine = ref(null)
+const formLine = ref(null)
+const endLine = ref(null)
+
+onMounted(() => {
+    if(!process.client) return
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(
+      75,
+      innerWidth / innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 80;
+
+    const renderer = new WebGLRenderer({ canvas: canvas.value });
+
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(devicePixelRatio);
+
+    const light = new DirectionalLight(0xffffff, 1);
+    light.position.set(0, 1, 1);
+    scene.add(light);
+
+    const backLight = new DirectionalLight(0x11ffff, 1);
+    backLight.position.set(0, 0, -1);
+    scene.add(backLight);
+
+    const starGeometry = new BufferGeometry();
+    const starMaterial = new PointsMaterial({ color: 0xffffff });
+    const starVertices = [];
+
+    for (let i = 0; i < 10000; i++) {
+        const x = (Math.random() - 0.5) * 2000;
+        const y = (Math.random() - 0.5) * 2000;
+        const z = (Math.random() - 0.5) * 2000;
+        starVertices.push(x, y, z);
+    }
+
+    starGeometry.setAttribute(
+      "position",
+      new Float32BufferAttribute(starVertices, 3)
+    );
+
+    const stars = new Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    let frame = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+
+      frame += 0.01;
+
+      stars.rotation.x += 0.0007;
+      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
+    }
+    animate();
+
+    addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    gsap.to(title.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    // lines
+    gsap.to(titleLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(formLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(endLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+})
+</script>
+
 <template>
   <div>
     <canvas ref="canvas"></canvas>
@@ -74,108 +184,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import gsap from "gsap";
-import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
-  DirectionalLight,
-  BufferGeometry,
-  PointsMaterial,
-  Float32BufferAttribute,
-  Points,
-} from "three";
-
-export default {
-  mounted() {
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
-      75,
-      innerWidth / innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 80;
-
-    const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
-
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(devicePixelRatio);
-
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(0, 1, 1);
-    scene.add(light);
-
-    const backLight = new DirectionalLight(0x11ffff, 1);
-    backLight.position.set(0, 0, -1);
-    scene.add(backLight);
-
-    const starGeometry = new BufferGeometry();
-    const starMaterial = new PointsMaterial({ color: 0xffffff });
-    const starVertices = [];
-
-    for (let i = 0; i < 10000; i++) {
-      const x = (Math.random() - 0.5) * 2000;
-      const y = (Math.random() - 0.5) * 2000;
-      const z = (Math.random() - 0.5) * 2000;
-      starVertices.push(x, y, z);
-    }
-
-    starGeometry.setAttribute(
-      "position",
-      new Float32BufferAttribute(starVertices, 3)
-    );
-
-    const stars = new Points(starGeometry, starMaterial);
-    scene.add(stars);
-
-    let frame = 0;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-
-      frame += 0.01;
-
-      stars.rotation.x += 0.0007;
-      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
-    }
-    animate();
-
-    addEventListener("resize", () => {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-
-    // GSAP animations to various parts of the page
-    gsap.to(this.$refs.title, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    // lines
-    gsap.to(this.$refs.titleLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.formLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.endLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-  },
-};
-</script>

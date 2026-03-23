@@ -1,3 +1,166 @@
+<script setup>
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+import gsap from 'gsap'
+import { cleanupScene } from '~/utils/threeHelper'
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  DirectionalLight,
+  BufferGeometry,
+  PointsMaterial,
+  Float32BufferAttribute,
+  Points,
+} from "three";
+import Blurb from "~/components/Blurb.vue";
+
+const canvas = ref(null)
+const title = ref(null)
+const employmentStatusTitle = ref(null)
+const shortTitle = ref(null)
+const longTitle = ref(null)
+const titleLine = ref(null)
+const breakerLine = ref(null)
+
+const shortBlurb = [
+  {
+    paragraph1:
+      "Hey, I’m Nicholas Harding — based in Christchurch, New Zealand. I started coding in 2020, completed two diplomas at Whitecliffe College, a Bachelor of IT in Software Development, and a Master of Human Interface Technology at the University of Canterbury (graduated with Merit). My thesis project, Project Mobius, is a large-scale crowd simulation platform built in Unreal Engine 5.5 — and the most rewarding thing I have built so far.",
+    paragraph2:
+      "These days I work primarily in C++ and Unreal Engine — building real-time simulations, VR experiences, and 3D environments. My current role involves VR development, environment building, data pipelines, and Python automation. I also integrate external hardware into Unreal Engine applications — recently connecting a treadmill sensor to drive locomotion speed in a VR simulation. I enjoy the kind of problems where you have to think carefully about performance and architecture to make something work well under real constraints.",
+  },
+]
+const longBlurb = [
+  {
+    paragraph1:
+      "Before I got into software, I spent about a decade doing all sorts of work — laboring, security, construction. I was steel fixing when I injured my knee pretty badly, and after surgery and a long recovery I tried to get back into it. Ended up going skiing and wiping out spectacularly, which bent my knee in every direction it was not supposed to go. That was pretty much the end of physically demanding work for me, so I had to figure out what was next.",
+    paragraph2:
+      "I had always been curious about coding, so I enrolled at Whitecliffe College and just went for it. Early on I struggled with imposter syndrome — I was nearly thirty, most of my peers were fresh out of school, and I felt like I was starting way behind. But once I pushed past that and realized the only person holding me back was me, things clicked. I found Unreal Engine and C++ during my studies and that was it — I was hooked. I spent countless hours outside of class learning through Udemy, reading documentation, and just building things to see what would break.",
+    paragraph3:
+      "My master’s at the University of Canterbury is where everything came together. Project Mobius started as a thesis project and grew into something much bigger — 118,000+ lines of C++ across 8 runtime modules, with an HDF5 data pipeline, GPU-driven heatmaps, VR support, and a lot of hard lessons about build systems and CI/CD. It was the kind of project where every week I was solving a problem I had never encountered before, and I loved every minute of it.",
+    paragraph4:
+      "Right now I work at the University of Canterbury as a Research Assistant, helping PhD and graduate students with their research and capstone projects — mostly in VR and Unreal Engine. It is a great role because I get to stay close to the kind of work I am passionate about while also learning from the research happening around me. I am always looking for the next challenge and the next opportunity to build something meaningful.",
+  },
+]
+const currentEmployment = "Employment Status: Research Assistant at the University of Canterbury"
+
+let renderer = null
+let scene = null
+let animationId = null
+let camera = null
+
+function onWindowResize() {
+    if(camera && renderer) {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    }
+}
+
+onMounted(() => {
+    if(!process.client) return
+    scene = new Scene();
+    camera = new PerspectiveCamera(
+      75,
+      innerWidth / innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 80;
+
+    renderer = new WebGLRenderer({ canvas: canvas.value, powerPreference: "high-performance" });
+
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const light = new DirectionalLight(0xffffff, 1);
+    light.position.set(0, 1, 1);
+    scene.add(light);
+
+    const backLight = new DirectionalLight(0x11ffff, 1);
+    backLight.position.set(0, 0, -1);
+    scene.add(backLight);
+
+    const starGeometry = new BufferGeometry();
+    const starMaterial = new PointsMaterial({ color: 0xffffff });
+    const starVertices = [];
+
+    // Reduced star count for performance
+    for (let i = 0; i < 5000; i++) {
+      const x = (Math.random() - 0.5) * 2000;
+      const y = (Math.random() - 0.5) * 2000;
+      const z = (Math.random() - 0.5) * 2000;
+      starVertices.push(x, y, z);
+    }
+
+    starGeometry.setAttribute(
+      "position",
+      new Float32BufferAttribute(starVertices, 3)
+    );
+
+    const stars = new Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    let frame = 0;
+
+    function animate() {
+      animationId = requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+
+      frame += 0.01;
+
+      stars.rotation.x += 0.0007;
+      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
+    }
+    animate();
+
+    window.addEventListener("resize", onWindowResize);
+
+    // ... (GSAP animations)
+    gsap.to(title.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(employmentStatusTitle.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(shortTitle.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(longTitle.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(titleLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+    gsap.to(breakerLine.value, {
+      opacity: 1,
+      duration: 2,
+      y: 0,
+      ease: "expo",
+    });
+});
+
+onBeforeUnmount(() => {
+    cleanupScene(scene, renderer, animationId)
+    window.removeEventListener("resize", onWindowResize);
+});
+</script>
+
 <template>
   <div>
     <canvas ref="canvas"></canvas>
@@ -22,7 +185,7 @@
         class="text-white text-sm md:text-md tracking-wider uppercase opacity-0 mb-3"
         style="transform: translateY(30px)"
       >
-        {{ this.currentEmployment }}
+        {{ currentEmployment }}
       </h4>
       <h4
         ref="shortTitle"
@@ -31,9 +194,17 @@
       >
         Short and Sweet
       </h4>
-      <div v-for="paragraph in shortBlurb">
+      <div v-for="paragraph in shortBlurb" :key="paragraph.paragraph1">
         <Blurb :paragraph="paragraph.paragraph1" />
         <Blurb :paragraph="paragraph.paragraph2" />
+      </div>
+      <div class="mt-2 mb-4 text-center md:text-left">
+        <a
+          href="https://ir.canterbury.ac.nz/items/0816750d-de14-4fce-82f1-9a42bf4b68ae"
+          class="border-2 px-6 py-2 rounded-full bg-black/90 hover:bg-white hover:text-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 font-ubuntu-mono uppercase text-lg inline-flex items-center justify-center border-white text-white"
+        >
+          Read My Research Thesis
+        </a>
       </div>
       <hr
         ref="breakerLine"
@@ -47,7 +218,7 @@
       >
         Want to know more of my story?
       </h4>
-      <div v-for="paragraph in longBlurb">
+      <div v-for="paragraph in longBlurb" :key="paragraph.paragraph1">
         <Blurb :paragraph="paragraph.paragraph1" />
         <Blurb :paragraph="paragraph.paragraph2" />
         <Blurb :paragraph="paragraph.paragraph3" />
@@ -56,149 +227,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import gsap from "gsap";
-import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
-  DirectionalLight,
-  BufferGeometry,
-  PointsMaterial,
-  Float32BufferAttribute,
-  Points,
-} from "three";
-import Blurb from "../components/Blurb.vue";
-
-export default {
-  components: {
-    Blurb,
-  },
-  data() {
-    return {
-      shortBlurb: [
-        {
-          paragraph1:
-            "So, to start this off, my name is Nicholas Harding I am thirty years old and live in Christchurch New Zealand. I recently began my coding journey in 2020 and started to learn various coding languages and practices from Whitecliffe College. During my time there I was able to complete two diplomas and currently enrolled into the Bachelor of Information Technology in Software Development, during this time I have spent countless hours in extra study learning more languages and skills through learning mediums such as Udemy and instructive YouTube videos, as coding is a passion that I am driven to grow and develop myself further in.",
-          paragraph2:
-            "In my coding experience I have taken a real shine to Game Development, Full Stack Development and Mobile Development, these are three areas that I have explored so far during my time of study and are areas that I enjoy the most because I do enjoy all types of programming that I have done so far.",
-        },
-      ],
-      longBlurb: [
-        {
-          paragraph1:
-            "You may be wondering what I was doing prior to 2020 and work I may have been involved in, well to put simply I have been a wide range of careers since 2010 varying from different forms of laboring jobs, different security jobs such a site protection and hospitality security, my last job was in construction as a steel fixer which came to an end when I injured my knee.",
-          paragraph2:
-            "After the injury I ended up requiring some surgery and committed to rebuilding my knee with lots of physio, once cleared and after some time I decided to go skiing and ended up epically wiping out and bending my knee in every other direction that it was supposed to go (I know Ouch! Eww!) which kind of ended my journey in the world of a physically demanding work i.e., steel fixing, so I was left with a broken leg for some time and had to figure out what I can do to make myself a career in something I’d enjoy doing, be able to provide for my family, and finally something that would stimulate me mentally. Which after evaluating the choices I had was an easy one to figure out as I had always wanted to get into coding.",
-          paragraph3:
-            "Some obstacles I had to over comer was that I had a big problem of imposter syndrome at the start of my learning journey and being nearly thirty at the time I decided to do this was a big hurdle for me to overcome as most of my peers would be fresh out of school. I didn’t let this deter me and pushed through knowing that my only challenge was me, once I overcame this and learnt that I can do this, I developed a real drive in bettering my knowledge in a variety of different coding languages and life skills that I can offer to employers, fellow developers and clients that will be an asset to them.",
-          paragraph4:
-            "What keeps me going and pushing is that I really do love learning this stuff and I just can’t get enough, sure there are other factors to this drive like expecting my first child in August has had a big impact in this but in short its easy to learn something you enjoy doing. I hope this wee blurb hasn’t bored you too much but felt anyone who wants to know me and check me out that these are some things you should know and want you to know, so thank you if you took time to read this.",
-        },
-      ],
-      currentEmployment:
-        "Employment Status: Currently Seeking Employment or Internship",
-    };
-  },
-
-  mounted() {
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
-      75,
-      innerWidth / innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 80;
-
-    const renderer = new WebGLRenderer({ canvas: this.$refs.canvas });
-
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(devicePixelRatio);
-
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(0, 1, 1);
-    scene.add(light);
-
-    const backLight = new DirectionalLight(0x11ffff, 1);
-    backLight.position.set(0, 0, -1);
-    scene.add(backLight);
-
-    const starGeometry = new BufferGeometry();
-    const starMaterial = new PointsMaterial({ color: 0xffffff });
-    const starVertices = [];
-
-    for (let i = 0; i < 10000; i++) {
-      const x = (Math.random() - 0.5) * 2000;
-      const y = (Math.random() - 0.5) * 2000;
-      const z = (Math.random() - 0.5) * 2000;
-      starVertices.push(x, y, z);
-    }
-
-    starGeometry.setAttribute(
-      "position",
-      new Float32BufferAttribute(starVertices, 3)
-    );
-
-    const stars = new Points(starGeometry, starMaterial);
-    scene.add(stars);
-
-    let frame = 0;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-
-      frame += 0.01;
-
-      stars.rotation.x += 0.0007;
-      stars.rotation.y += Math.cos(Math.random() - 0.5) * 0.0006;
-    }
-    animate();
-
-    addEventListener("resize", () => {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-
-    gsap.to(this.$refs.title, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.employmentStatusTitle, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.shortTitle, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.longTitle, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.titleLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-    gsap.to(this.$refs.breakerLine, {
-      opacity: 1,
-      duration: 2,
-      y: 0,
-      ease: "expo",
-    });
-  },
-};
-</script>
