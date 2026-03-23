@@ -1,7 +1,11 @@
 <template>
   <div>
-    <Navbar />
-    <slot />
+    <header>
+      <Navbar />
+    </header>
+    <main>
+      <slot />
+    </main>
   </div>
 </template>
 

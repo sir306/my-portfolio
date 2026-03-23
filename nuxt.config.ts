@@ -7,8 +7,13 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/google-fonts'
+    '@nuxtjs/google-fonts',
+    '@nuxtjs/sitemap'
   ],
+  site: {
+    url: 'https://www.nickscoding.website',
+    name: "Nick's Coding Website"
+  },
   googleFonts: {
     families: {
       "Exo+2": {
@@ -19,12 +24,17 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'nicks-coding-website',
+      title: "Nick's Coding Website",
+      htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: '' },
+        { name: 'description', content: 'Nicholas Harding — C++ and Unreal Engine developer based in Christchurch, NZ. Portfolio showcasing large-scale crowd simulation, VR experiences, and real-time 3D applications.' },
         { name: 'format-detection', content: 'telephone=no' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: "Nick's Coding Website" },
+        { property: 'og:locale', content: 'en_NZ' },
+        { name: 'twitter:card', content: 'summary' },
         {
           'http-equiv': 'Content-Security-Policy',
           content: "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; font-src 'self' https: data:;"

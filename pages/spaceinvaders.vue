@@ -3,6 +3,15 @@ import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { run } from "~/scripts/spaceinvaders";
 import backgroundMusic from "~/assets/audio/backgroundMusic.wav";
 import { cleanupScene } from '~/utils/threeHelper'
+
+useSeoMeta({
+  title: "Space Invaders — Nick's Coding Website",
+  description: 'Play a browser-based Space Invaders game built with HTML5 Canvas. Use A/D to move, Space to shoot.',
+  ogTitle: "Space Invaders — Nick's Coding Website",
+  ogDescription: 'Play Space Invaders in your browser — a retro arcade game built with HTML5 Canvas.',
+  twitterTitle: "Space Invaders — Nick's Coding Website",
+  twitterDescription: 'Play Space Invaders in your browser — a retro arcade game built with HTML5 Canvas.',
+})
 import {
   PlaneGeometry,
   BufferAttribute,

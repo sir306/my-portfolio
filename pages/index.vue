@@ -2,6 +2,15 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import gsap from 'gsap'
+
+useSeoMeta({
+  title: "Nick's Coding Website",
+  description: 'Nicholas Harding — C++ and Unreal Engine developer building large-scale simulation platforms. Based in Christchurch, New Zealand.',
+  ogTitle: "Nick's Coding Website",
+  ogDescription: 'C++ and Unreal Engine developer building large-scale simulation platforms.',
+  twitterTitle: "Nick's Coding Website",
+  twitterDescription: 'C++ and Unreal Engine developer building large-scale simulation platforms.',
+})
 import { cleanupScene } from '~/utils/threeHelper'
 import {
   ColorManagement,

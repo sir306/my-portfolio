@@ -14,6 +14,15 @@ import {
 } from "three";
 import Blurb from "~/components/Blurb.vue";
 
+useSeoMeta({
+  title: "About Me — Nick's Coding Website",
+  description: 'Nicholas Harding — from steel fixing to software engineering. C++ and Unreal Engine developer, MHITech graduate from the University of Canterbury, currently a Research Assistant working on VR and simulation.',
+  ogTitle: "About Me — Nick's Coding Website",
+  ogDescription: 'From steel fixing to software engineering — the story of a C++ and Unreal Engine developer.',
+  twitterTitle: "About Me — Nick's Coding Website",
+  twitterDescription: 'From steel fixing to software engineering — the story of a C++ and Unreal Engine developer.',
+})
+
 const canvas = ref(null)
 const title = ref(null)
 const employmentStatusTitle = ref(null)

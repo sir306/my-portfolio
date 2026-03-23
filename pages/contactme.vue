@@ -13,6 +13,15 @@ import {
   Points,
 } from "three";
 
+useSeoMeta({
+  title: "Contact Me — Nick's Coding Website",
+  description: 'Get in touch with Nicholas Harding. Find me on LinkedIn and GitHub, or send a message directly.',
+  ogTitle: "Contact Me — Nick's Coding Website",
+  ogDescription: 'Get in touch with Nicholas Harding via LinkedIn, GitHub, or the contact form.',
+  twitterTitle: "Contact Me — Nick's Coding Website",
+  twitterDescription: 'Get in touch with Nicholas Harding via LinkedIn, GitHub, or the contact form.',
+})
+
 // refs
 const canvas = ref(null)
 const title = ref(null)

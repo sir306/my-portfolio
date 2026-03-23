@@ -15,6 +15,15 @@ import {
 import { Projects } from "~/data/projects";
 import Project from "~/components/Project.vue";
 
+useSeoMeta({
+  title: "My Work — Nick's Coding Website",
+  description: 'Projects by Nicholas Harding — crowd simulation platforms, VR experiences, Unreal Engine tools, mobile apps, and browser-based games.',
+  ogTitle: "My Work — Nick's Coding Website",
+  ogDescription: 'Crowd simulation, VR, Unreal Engine, and more — project portfolio.',
+  twitterTitle: "My Work — Nick's Coding Website",
+  twitterDescription: 'Crowd simulation, VR, Unreal Engine, and more — project portfolio.',
+})
+
 const canvas = ref(null)
 const title = ref(null)
 const projectsRef = ref([])
