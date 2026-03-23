@@ -1,0 +1,8 @@
+[build]
+  command = "npm run generate"
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
