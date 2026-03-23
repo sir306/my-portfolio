@@ -1,6 +1,9 @@
 {
   "name": "my-portfolio",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
