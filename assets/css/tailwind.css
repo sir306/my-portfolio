@@ -1,7 +1,8 @@
 /* Tailwind 4, set up to look and behave the same as the site did on Tailwind 3. */
 @import "tailwindcss" source(none);
 
-/* Scan the same files the Nuxt Tailwind module scanned on Tailwind 3. */
+/* Scan the same files the Nuxt Tailwind module scanned on Tailwind 3. Classes in any other
+   folder (e.g. a new composables/ or plugins/) are only generated once it's added here. */
 @source "../../components";
 @source "../../layouts";
 @source "../../pages";
@@ -13,8 +14,19 @@
    behaviour, where tapping a link or button on a phone shows them too. */
 @custom-variant hover (&:hover);
 
-/* Tailwind 3's values for the colours the site uses; Tailwind 4 changed them slightly. */
 @theme {
+  /* Breakpoints in px, as in Tailwind 3. Tailwind 4 uses rem, which in a media query
+     follows the visitor's browser font size, so a larger default font would switch
+     layouts at wider screens than the live site does. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* Tailwind 3's values for the colours the site uses; Tailwind 4 changed them slightly.
+     Any other palette colour gets Tailwind 4's value unless it's added here. */
   --color-gray-200: #e5e7eb;
   --color-gray-500: #6b7280;
   --color-gray-800: #1f2937;
