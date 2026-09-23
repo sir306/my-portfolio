@@ -67,6 +67,8 @@ export function run({ sounds } = {}) {
     newGame: false,
   };
   let score = 0;
+  // counts restarts, so timers left over from a finished game can't touch the next one
+  let round = 0;
 
   // paused: a game is in progress but on hold (the game over screen doesn't count)
   const isPaused = () => game.newGame && !game.active && !game.over;
@@ -107,6 +109,7 @@ export function run({ sounds } = {}) {
 
   // reset game
   function resetGame() {
+    round++;
     // splice existing data from arrays
     particles.splice(0, particles.length);
     grids.splice(0, grids.length);
@@ -125,13 +128,14 @@ export function run({ sounds } = {}) {
   function gameOver(reason, timeout) {
     // gameOver can run on several frames in a row, so only the first call plays the sound
     if (!game.over) sounds?.play("gameOver");
+    const gameRound = round;
     //pause animations
     setTimeout(() => {
-      game.active = false;
+      if (round === gameRound) game.active = false;
     }, timeout);
     // display menu
     setTimeout(() => {
-      gameoverMenu.style.opacity = 1;
+      if (round === gameRound) gameoverMenu.style.opacity = 1;
     }, timeout);
     // destroy player explosion
     createParticles({
@@ -213,7 +217,9 @@ export function run({ sounds } = {}) {
         invaderProjectile.position.x <= player.position.x + player.width
       ) {
         // projectile hits player
+        const hitRound = round;
         setTimeout(() => {
+          if (round !== hitRound) return;
           invaderProjectiles.splice(index, 1);
           player.opacity = 0;
           game.over = true;

@@ -182,7 +182,7 @@ describe('space invaders sounds', () => {
 
   // The game keeps animating behind the game over menu (as on the live site), and
   // invaders keep firing there, so their sound has to check the game state itself.
-  test('invader fire and explosions stay quiet on the game over screen', () => {
+  test('invader fire stays quiet on the game over screen', () => {
     tap('Enter')
     for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
     const overAt = sounds.played.length
@@ -281,5 +281,50 @@ describe('space invaders pause and restart', () => {
     tap('Enter')
     frame()
     assert.equal(queuedFrames.length, 1, 'a single game loop')
+  })
+
+  // A short screen makes the invaders reach the ship quickly. gameOver() then runs on
+  // many frames, and each call leaves timers behind.
+  function loseToAnInvasion() {
+    cleanup()
+    globalThis.innerHeight = 150
+    cleanup = run({ sounds })
+    loadImages()
+    tap('Enter')
+    for (let n = 0; n < 5000 && count('gameOver') === 0; n++) frame()
+    for (let n = 0; n < 200; n++) frame() // the game over menu is up
+  }
+
+  test('a restarted game is not frozen by timers left over from the last one', () => {
+    loseToAnInvasion()
+    tap('Enter')
+    for (let n = 0; n < 60; n++) frame() // longer than the 500 ms game over timers
+    assert.equal(queuedFrames.length, 1, 'the new game is still running')
+    assert.equal(Number(document.getElementById('gameOverMenu').style.opacity), 0, 'the game over menu stays hidden')
+  })
+
+  test('restarting right after a stray shot hits the wrecked ship still starts a live game', () => {
+    tap('Enter')
+    for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
+    for (let n = 0; n < 200; n++) frame() // the game over menu is up
+    const reason = document.getElementById('gameOverReasonEl')
+    // Step frame by frame until an invader shot hits the ship's wreck (gameOver() runs
+    // again and rewrites the reason). That frame leaves a follow-up timer, and Enter lands
+    // before it runs.
+    let hit = false
+    for (let n = 0; n < 20000 && !hit; n++) {
+      reason.textContent = ''
+      runQueuedFrames()
+      hit = reason.textContent === 'You were destroyed by an invader projectile!'
+      if (!hit) {
+        loadImages()
+        mock.timers.tick(16)
+      }
+    }
+    assert.ok(hit, 'an invader shot hit the wreck')
+    tap('Enter')
+    for (let n = 0; n < 60; n++) frame()
+    tap('Escape')
+    assert.equal(sounds.played.at(-1), 'select', 'the new game can be paused, so it is not over')
   })
 })
