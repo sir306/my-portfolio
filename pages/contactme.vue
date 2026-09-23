@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, reactive, ref } from 'vue'
+import { nextTick, onMounted, onBeforeUnmount, reactive, ref } from 'vue'
 import gsap from 'gsap'
 import { cleanupScene } from '~/utils/threeHelper'
 import { validateContact } from '~/utils/contactValidation'
@@ -34,12 +34,15 @@ const formEl = ref(null)
 const errors = reactive({})
 const sending = ref(false)
 
-function showErrors(found) {
+async function showErrors(found) {
   for (const key of Object.keys(errors)) delete errors[key]
   Object.assign(errors, found)
-  // Move focus to the first problem so keyboard and screen-reader users land on it.
-  const first = ['name', 'email', 'message'].find((field) => found[field])
-  if (first) formEl.value.elements.namedItem(first).focus()
+  const invalid = ['name', 'email', 'message'].filter((field) => found[field])
+  // The alert is announced even when focus can't move (e.g. Enter pressed in the field).
+  if (invalid.length > 0 && !found.form) errors.form = "Your message wasn't sent. Please fix the highlighted fields."
+  // Let the messages render first, so screen readers read the reason with the field.
+  await nextTick()
+  if (invalid.length > 0) formEl.value.elements.namedItem(invalid[0]).focus()
 }
 
 function clearError(field) {
@@ -55,29 +58,38 @@ async function onSubmit(event) {
 
   const data = new FormData(formEl.value)
   const found = validateContact(Object.fromEntries(data))
-  showErrors(found)
+  await showErrors(found)
   if (Object.keys(found).length > 0) return
 
   sending.value = true
+  let response
   try {
-    const response = await fetch(formEl.value.getAttribute('action'), {
+    response = await fetch(formEl.value.getAttribute('action'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
       body: new URLSearchParams(data).toString(),
     })
-    if (response.ok) {
-      await navigateTo('/contactmesuccess')
-      return
-    }
-    const reply = await response.json().catch(() => null)
-    showErrors(reply?.errors ?? {
-      form: `Sorry, your message couldn't be sent (the server replied with error ${response.status}). Please try again in a few minutes, or message me on LinkedIn.`,
-    })
   } catch {
-    showErrors({ form: "Your message couldn't be sent because the site couldn't be reached. Check your connection and try again." })
-  } finally {
     sending.value = false
+    return showErrors({ form: "Your message couldn't be sent because the site couldn't be reached. Check your connection and try again." })
   }
+
+  if (response.ok) {
+    // The message is in. Stay in the sending state so another click can't duplicate it,
+    // and never report a routing hiccup as a failed send.
+    try {
+      await navigateTo('/contactmesuccess')
+    } catch {
+      location.assign('/contactmesuccess/')
+    }
+    return
+  }
+
+  sending.value = false
+  const reply = await response.json().catch(() => null)
+  showErrors(reply?.errors ?? {
+    form: `Sorry, your message couldn't be sent (the server replied with error ${response.status}). Please try again in a few minutes, or message me on LinkedIn.`,
+  })
 }
 
 let renderer = null
@@ -262,7 +274,7 @@ onBeforeUnmount(() => {
               class="flex flex-col gap-6"
               name="contact"
               method="POST"
-              action="/contactmesuccess"
+              action="/contactmesuccess/"
               data-netlify="true"
               netlify-honeypot="bot-field"
               @submit="onSubmit"
@@ -274,8 +286,8 @@ onBeforeUnmount(() => {
 
               <div class="group relative">
                 <input
-                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
-                  :class="errors.name ? 'border-red-400' : 'border-white/50'"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none py-2 px-2 transition-all duration-300"
+                  :class="errors.name ? 'border-red-400' : 'border-white/50 focus:border-cyan-400'"
                   type="text"
                   id="name"
                   name="name"
@@ -296,8 +308,8 @@ onBeforeUnmount(() => {
 
               <div class="group relative">
                 <input
-                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
-                  :class="errors.email ? 'border-red-400' : 'border-white/50'"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none py-2 px-2 transition-all duration-300"
+                  :class="errors.email ? 'border-red-400' : 'border-white/50 focus:border-cyan-400'"
                   type="email"
                   id="email"
                   name="email"
@@ -318,8 +330,8 @@ onBeforeUnmount(() => {
 
               <div class="group relative">
                 <textarea
-                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300 min-h-[120px]"
-                  :class="errors.message ? 'border-red-400' : 'border-white/50'"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none py-2 px-2 transition-all duration-300 min-h-[120px]"
+                  :class="errors.message ? 'border-red-400' : 'border-white/50 focus:border-cyan-400'"
                   name="message"
                   id="message"
                   placeholder="Message"
@@ -340,9 +352,9 @@ onBeforeUnmount(() => {
               <p v-if="errors.form" role="alert" class="text-red-400 font-ubuntu-mono text-center">{{ errors.form }}</p>
 
               <button
-                class="self-center mt-4 border-2 border-white text-white font-ubuntu-mono text-xl uppercase px-12 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-wait"
+                class="self-center mt-4 border-2 border-white text-white font-ubuntu-mono text-xl uppercase px-12 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 active:scale-95 aria-disabled:opacity-50 aria-disabled:cursor-wait"
                 type="submit"
-                :disabled="sending"
+                :aria-disabled="sending ? 'true' : undefined"
               >
                 {{ sending ? 'Sending...' : 'Send Message' }}
               </button>

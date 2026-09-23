@@ -8,7 +8,7 @@ export const HONEYPOT_FIELD = 'bot-field'
 export const LIMITS = {
   name: 100,
   email: 254,
-  messageMin: 10,
+  messageMin: 2,
   messageMax: 5000,
 }
 
@@ -17,7 +17,7 @@ export const LIMITS = {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/
 
 // trim() keeps zero-width characters, which would otherwise pass as a message.
-const INVISIBLE = /[​-‍⁠﻿]/g
+const INVISIBLE = /[\u200B-\u200D\u2060\uFEFF]/g
 
 function clean(value) {
   return typeof value === 'string' ? value.replace(INVISIBLE, '').trim() : ''
@@ -31,7 +31,7 @@ export function validateContact(fields) {
   const message = clean(fields.message)
 
   if (clean(fields[HONEYPOT_FIELD])) {
-    errors.form = "This looks like an automated submission (a hidden anti-spam field was filled in). If you're a person, please reload the page and try again."
+    errors.form = "This looks like an automated submission (a hidden anti-spam field was filled in). If you're a person, please reload the page and try again, or message me on LinkedIn."
   }
 
   if (!name) {

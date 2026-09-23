@@ -4,25 +4,48 @@
 // `required` attributes (those only run in the browser), so bots posting straight to
 // the site were creating blank submissions and blank notification emails.
 //
-// Edge functions run before Netlify Forms sees a request. Invalid contact submissions
-// are answered here with the reasons and never reach Forms; everything else carries on
-// to Netlify exactly as it arrived.
-import { CONTACT_FORM_NAME, validateContact } from '../../utils/contactValidation.js'
+// Edge functions run before Netlify Forms sees a request. A valid contact submission
+// carries on to Netlify exactly as it arrived; anything else is answered here with
+// the reasons and never reaches Forms. The contact form is the only form on this
+// site, so every other POST is refused too. If another form is ever added, allow its
+// form-name below.
+import { CONTACT_FORM_NAME, HONEYPOT_FIELD, validateContact } from '../../utils/contactValidation.js'
+
+// Far above the largest real submission (about 46 KB: 5000 characters of CJK text,
+// percent-encoded), and small enough that parsing can't hit the edge function's CPU
+// limit, which would skip this check entirely (see onError below).
+const MAX_BODY_BYTES = 128 * 1024
+
+const UNREADABLE = { form: "Your submission couldn't be read. Please send it from the form on the contact page." }
 
 export default async (request, context) => {
   const raw = await request.arrayBuffer()
+  if (raw.byteLength > MAX_BODY_BYTES) {
+    return reject(request, { form: 'Your submission is too large to send. Please shorten your message.' }, 413)
+  }
 
   let fields
   try {
     fields = await readFields(raw, request.headers.get('content-type') ?? '')
   } catch {
-    return reject(request, { form: "Your submission couldn't be read. Please send it from the form on the contact page." }, 400)
+    return reject(request, UNREADABLE, 400)
   }
 
-  if (fields.get('form-name') === CONTACT_FORM_NAME) {
-    const errors = validateContact(Object.fromEntries(fields))
-    if (Object.keys(errors).length > 0) return reject(request, errors)
+  // Exact matches only: guessing how Netlify reads "Contact" or "contact;name=" would
+  // leave a way around this check.
+  const formNames = fields.getAll('form-name')
+  if (formNames.length === 0 || formNames.some((name) => name !== CONTACT_FORM_NAME)) {
+    return reject(request, { form: "This site doesn't accept that form." }, 404)
   }
+
+  // A browser sends each field once. Repeats are refused because Netlify could read a
+  // different copy from the one checked here.
+  if (['name', 'email', 'message', HONEYPOT_FIELD].some((field) => fields.getAll(field).length > 1)) {
+    return reject(request, UNREADABLE, 400)
+  }
+
+  const errors = validateContact(Object.fromEntries(fields))
+  if (Object.keys(errors).length > 0) return reject(request, errors)
 
   // Reading the body above used it up, so Netlify gets a fresh request with the same
   // bytes. Passing the original on would hand Forms an empty body.
@@ -37,7 +60,7 @@ export const config = {
 }
 
 async function readFields(raw, contentType) {
-  if (contentType.includes('multipart/form-data')) {
+  if (contentType.toLowerCase().includes('multipart/form-data')) {
     return new Request('https://form.invalid/', { method: 'POST', headers: { 'content-type': contentType }, body: raw }).formData()
   }
   // Browsers send application/x-www-form-urlencoded. Bots often send no header or

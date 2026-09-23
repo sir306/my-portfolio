@@ -47,7 +47,7 @@ describe('validateContact', () => {
   })
 
   test('treats whitespace and zero-width characters as empty', () => {
-    const errors = validateContact({ ...valid, name: '   ', message: '​ \n\t​' })
+    const errors = validateContact({ ...valid, name: '   ', message: '\u200B \n\t\u200B' })
     assert.match(errors.name, /enter your name/i)
     assert.match(errors.message, /can't be empty/i)
   })
@@ -64,16 +64,24 @@ describe('validateContact', () => {
     }
   })
 
-  test('rejects a message too short to reply to', () => {
-    assert.match(validateContact({ ...valid, message: 'hi' }).message, /at least 10 characters/i)
+  test('rejects a one-character message', () => {
+    assert.match(validateContact({ ...valid, message: 'k' }).message, /at least 2 characters/i)
+  })
+
+  test('accepts short but real messages', () => {
+    for (const message of ['Hi', 'Call me', 'Hire you?']) {
+      assert.equal(validateContact({ ...valid, message }).message, undefined, message)
+    }
   })
 
   test('rejects an over-long message and says how long it is', () => {
     assert.match(validateContact({ ...valid, message: 'a'.repeat(5001) }).message, /5001 characters/)
   })
 
-  test('flags a filled-in honeypot as automated', () => {
-    assert.match(validateContact({ ...valid, 'bot-field': 'http://spam.example' }).form, /automated/i)
+  test('flags a filled-in honeypot as automated and offers another way to get in touch', () => {
+    const { form } = validateContact({ ...valid, 'bot-field': 'http://spam.example' })
+    assert.match(form, /automated/i)
+    assert.match(form, /LinkedIn/)
   })
 })
 
@@ -160,10 +168,59 @@ describe('contact-guard edge function', () => {
     assert.equal(netlify.forwarded, null)
   })
 
-  test('leaves POSTs for other forms untouched', async () => {
+  test('forwards non-ASCII messages byte-for-byte', async () => {
+    const body = new URLSearchParams({ ...valid, name: 'Māui Tīpene', message: 'Kia ora Nick – loved Project Mobius! 🚀\nNgā mihi.' }).toString()
     const netlify = fakeNetlify()
-    const response = await contactGuard(post('/', 'form-name=newsletter&email='), netlify)
-    assert.equal(response.status, 200)
-    assert.equal(await netlify.forwarded.text(), 'form-name=newsletter&email=')
+    await contactGuard(post('/contactmesuccess/', body), netlify)
+    assert.equal(await netlify.forwarded.text(), body)
+  })
+
+  test('accepts a repeated form-name when every copy is contact', async () => {
+    const netlify = fakeNetlify()
+    await contactGuard(post('/', 'form-name=contact&' + new URLSearchParams(valid).toString()), netlify)
+    assert.notEqual(netlify.forwarded, null)
+  })
+
+  test('refuses POSTs for any other form, since contact is the only one', async () => {
+    for (const body of ['form-name=newsletter&email=', 'name=&email=&message=', '']) {
+      const netlify = fakeNetlify()
+      const response = await contactGuard(post('/', body), netlify)
+      assert.equal(response.status, 404, body)
+      assert.equal(netlify.forwarded, null, body)
+    }
+  })
+
+  test('refuses look-alike form names instead of guessing how Netlify reads them', async () => {
+    for (const formName of ['form-name=Contact', 'form-name=contact%20', 'form-name=contact;name=', 'form-name=x&form-name=contact']) {
+      const netlify = fakeNetlify()
+      await contactGuard(post('/', formName), netlify)
+      assert.equal(netlify.forwarded, null, formName)
+    }
+  })
+
+  test('refuses repeated fields, which another parser could read differently', async () => {
+    const body = 'form-name=contact&name=&name=Ada&email=ada%40example.com&message=Hello+there'
+    const netlify = fakeNetlify()
+    const response = await contactGuard(post('/', body), netlify)
+    assert.equal(response.status, 400)
+    assert.equal(netlify.forwarded, null)
+  })
+
+  test('reads the multipart content type case-insensitively', async () => {
+    const form = new FormData()
+    form.set('form-name', 'contact')
+    const encoded = new Request(SITE + '/', { method: 'POST', body: form })
+    const shouting = encoded.headers.get('content-type').replace('multipart/form-data', 'Multipart/Form-Data')
+    const netlify = fakeNetlify()
+    const response = await contactGuard(new Request(SITE + '/', { method: 'POST', headers: { 'content-type': shouting }, body: await encoded.arrayBuffer() }), netlify)
+    assert.equal(response.status, 422)
+    assert.equal(netlify.forwarded, null)
+  })
+
+  test('refuses oversized bodies before trying to parse them', async () => {
+    const netlify = fakeNetlify()
+    const response = await contactGuard(post('/', 'form-name=contact&message=' + 'a'.repeat(200_000)), netlify)
+    assert.equal(response.status, 413)
+    assert.equal(netlify.forwarded, null)
   })
 })
