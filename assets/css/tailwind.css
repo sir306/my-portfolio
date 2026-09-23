@@ -1,0 +1,42 @@
+/* Tailwind 4, set up to look and behave the same as the site did on Tailwind 3. */
+@import "tailwindcss" source(none);
+
+/* Scan the same files the Nuxt Tailwind module scanned on Tailwind 3. */
+@source "../../components";
+@source "../../layouts";
+@source "../../pages";
+@source "../../utils";
+@source "../../app.vue";
+@source "../../error.vue";
+
+/* Tailwind 4 only shows hover styles on devices with a mouse. Keep Tailwind 3's
+   behaviour, where tapping a link or button on a phone shows them too. */
+@custom-variant hover (&:hover);
+
+/* Tailwind 3's values for the colours the site uses; Tailwind 4 changed them slightly. */
+@theme {
+  --color-gray-200: #e5e7eb;
+  --color-gray-500: #6b7280;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-red-400: #f87171;
+  --color-cyan-400: #22d3ee;
+}
+
+@layer base {
+  /* Tailwind 3 drew borders light grey unless a colour was given (e.g. the lines under
+     the page titles). Tailwind 4 uses the text colour. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  /* Tailwind 3 gave buttons a pointer cursor; Tailwind 4 leaves the browser default. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

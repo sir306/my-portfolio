@@ -46,7 +46,7 @@ onMounted(() => {
         </h1>
 
         <div
-          class="flex flex-wrap divide-x-2 justify-start m-auto md:w-auto w-11/12"
+          class="flex flex-wrap justify-start m-auto md:w-auto w-11/12"
         >
           <div
             v-for="(language, index) in languages"
@@ -54,7 +54,7 @@ onMounted(() => {
             class="font-ubuntu-mono text-left text-lg md:text-xl font-medium"
             :class="{
               'pr-2': index === 0,
-              'px-2': index !== 0,
+              'px-2 border-l-2': index !== 0,
             }"
           >
             {{ language }}

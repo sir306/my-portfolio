@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
       <div class="grid grid-cols-1 gap-4">
         <div class="justify-self-center max-w-4xl">
           <p
-            class="text-white font-ubuntu-mono text-sm md:text-xl tracking-wide uppercase opacity-1 mb-3"
+            class="text-white font-ubuntu-mono text-sm md:text-xl tracking-wide uppercase mb-3"
           >
             There are various ways to get in touch with me and I am active on
             these platforms weekly, you can either click on the links below and
@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
         </div>
         <div class="justify-self-center max-w-4xl">
           <p
-            class="text-white font-exo2 text-lg md:text-2xl uppercase opacity-1 mb-0"
+            class="text-white font-exo2 text-lg md:text-2xl uppercase mb-0"
           >
             My profiles and channels
           </p>
@@ -165,21 +165,21 @@ onBeforeUnmount(() => {
         <div class="justify-self-center">
           <p class="py-2">
             <a
-              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase mb-3 hover:bg-white hover:text-gray-800"
               href="https://www.linkedin.com/in/nicholas-harding-9b240a1a3/"
               >LinkedIn Profile</a
             >
           </p>
           <p class="py-2">
             <a
-              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase mb-3 hover:bg-white hover:text-gray-800"
               href="https://github.com/sir306"
               >GitHub</a
             >
           </p>
           <p class="py-2">
             <a
-              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase mb-3 hover:bg-white hover:text-gray-800"
               href="https://www.youtube.com/channel/UCGYiCTWIWc5LFNIbw02PizA"
               >YouTube Channel</a
             >
@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
         />
         <div class="justify-self-center max-w-4xl">
           <p
-            class="text-white font-exo2 text-lg md:text-2xl uppercase opacity-1 mb-0"
+            class="text-white font-exo2 text-lg md:text-2xl uppercase mb-0"
           >
             Message Sent
           </p>

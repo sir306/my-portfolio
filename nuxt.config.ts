@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-12-17',
@@ -12,16 +14,18 @@ export default defineNuxtConfig({
     // Nuxt 4 stopped inlining global CSS (Tailwind) into the page; keep the Nuxt 3 output.
     inlineStyles: true
   },
-  // Tailwind 3 relies on empty variables written as `--tw-*: ;`. cssnano 8 (Nuxt 4's CSS
-  // optimiser) rewrites them as `--tw-*:;`, which older browsers reject, dropping effects
-  // such as the contact form's backdrop blur. Turn it off, and minify with esbuild as the
-  // Nuxt 3 build (Vite 7) did, so the CSS stays as close as possible to the live site.
+  // Minify CSS with esbuild, as the Nuxt 3 build (Vite 7) did, instead of cssnano 8 (Nuxt 4's
+  // CSS optimiser). This began because cssnano 8 broke Tailwind 3's empty `--tw-*: ;`
+  // variables. Tailwind 4 no longer writes those, but the site's look was checked against
+  // the esbuild output, so the build keeps using it.
   postcss: {
     plugins: {
       cssnano: false
     }
   },
+  css: ['~/assets/css/tailwind.css'],
   vite: {
+    plugins: [tailwindcss()],
     build: {
       cssMinify: 'esbuild'
     }
@@ -36,10 +40,14 @@ export default defineNuxtConfig({
     },
   },
   modules: [
-    '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
     '@nuxtjs/sitemap'
   ],
+  routeRules: {
+    // @nuxtjs/sitemap 7 added this header for the sitemap's stylesheet; version 8 only sets
+    // it when a server renders the file, and this site is static. Keep serving it the same.
+    '/__sitemap__/style.xsl': { headers: { 'Content-Type': 'application/xslt+xml' } }
+  },
   site: {
     url: 'https://www.nickscoding.website',
     name: "Nick's Coding Website"

@@ -258,7 +258,7 @@ function onViewWork(event) {
     <canvas ref="canvas"></canvas>
     <div
       id="container-home"
-      class="absolute text-white text-center w-full max-w-5xl px-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      class="absolute text-white text-center w-full max-w-5xl px-6 top-1/2 left-1/2"
     >
       <h1
         id="nicholas"

@@ -22,11 +22,15 @@ html {
   box-sizing: border-box;
   overflow-y: hidden !important;
 }
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
+/* In Tailwind's base layer: Tailwind 4 uses CSS layers, and a rule outside them would
+   beat every Tailwind class, wiping out margins such as mb-3. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+  }
 }
 .font-exo2 {
   font-family: "Exo 2", sans-serif;
