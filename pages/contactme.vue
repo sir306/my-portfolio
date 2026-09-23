@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, reactive, ref } from 'vue'
 import gsap from 'gsap'
 import { cleanupScene } from '~/utils/threeHelper'
+import { validateContact } from '~/utils/contactValidation'
 import {
   Scene,
   PerspectiveCamera,
@@ -28,6 +29,56 @@ const title = ref(null)
 const titleLine = ref(null)
 const formLine = ref(null)
 const endLine = ref(null)
+const formEl = ref(null)
+
+const errors = reactive({})
+const sending = ref(false)
+
+function showErrors(found) {
+  for (const key of Object.keys(errors)) delete errors[key]
+  Object.assign(errors, found)
+  // Move focus to the first problem so keyboard and screen-reader users land on it.
+  const first = ['name', 'email', 'message'].find((field) => found[field])
+  if (first) formEl.value.elements.namedItem(first).focus()
+}
+
+function clearError(field) {
+  delete errors[field]
+  delete errors.form
+}
+
+// Checked here for instant feedback. netlify/edge-functions/contact-guard.js applies
+// the same rules on the server, where bots can't skip them.
+async function onSubmit(event) {
+  event.preventDefault()
+  if (sending.value) return
+
+  const data = new FormData(formEl.value)
+  const found = validateContact(Object.fromEntries(data))
+  showErrors(found)
+  if (Object.keys(found).length > 0) return
+
+  sending.value = true
+  try {
+    const response = await fetch(formEl.value.getAttribute('action'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+      body: new URLSearchParams(data).toString(),
+    })
+    if (response.ok) {
+      await navigateTo('/contactmesuccess')
+      return
+    }
+    const reply = await response.json().catch(() => null)
+    showErrors(reply?.errors ?? {
+      form: `Sorry, your message couldn't be sent (the server replied with error ${response.status}). Please try again in a few minutes, or message me on LinkedIn.`,
+    })
+  } catch {
+    showErrors({ form: "Your message couldn't be sent because the site couldn't be reached. Check your connection and try again." })
+  } finally {
+    sending.value = false
+  }
+}
 
 let renderer = null
 let scene = null
@@ -44,6 +95,8 @@ function onWindowResize() {
 
 onMounted(() => {
     if(!process.client) return
+    // The script is running, so show our own messages instead of the browser's bubbles.
+    formEl.value.noValidate = true
     scene = new Scene();
     camera = new PerspectiveCamera(
       75,
@@ -205,22 +258,32 @@ onBeforeUnmount(() => {
               Send me a message
             </h3>
             <form
+              ref="formEl"
               class="flex flex-col gap-6"
               name="contact"
               method="POST"
               action="/contactmesuccess"
               data-netlify="true"
+              netlify-honeypot="bot-field"
+              @submit="onSubmit"
             >
               <input type="hidden" name="form-name" value="contact" />
-              
+              <p class="hidden">
+                <label>Don't fill this out if you're human: <input name="bot-field" autocomplete="off" /></label>
+              </p>
+
               <div class="group relative">
                 <input
-                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  :class="errors.name ? 'border-red-400' : 'border-white/50'"
                   type="text"
                   id="name"
                   name="name"
                   placeholder="Name"
                   required
+                  :aria-invalid="errors.name ? 'true' : undefined"
+                  :aria-describedby="errors.name ? 'name-error' : undefined"
+                  @input="clearError('name')"
                 />
                 <label
                   for="name"
@@ -228,16 +291,21 @@ onBeforeUnmount(() => {
                 >
                   Your Name
                 </label>
+                <p v-if="errors.name" id="name-error" class="mt-2 text-red-400 text-sm font-ubuntu-mono">{{ errors.name }}</p>
               </div>
 
               <div class="group relative">
                 <input
-                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300"
+                  :class="errors.email ? 'border-red-400' : 'border-white/50'"
                   type="email"
                   id="email"
                   name="email"
                   placeholder="Email"
                   required
+                  :aria-invalid="errors.email ? 'true' : undefined"
+                  :aria-describedby="errors.email ? 'email-error' : undefined"
+                  @input="clearError('email')"
                 />
                 <label
                   for="email"
@@ -245,15 +313,20 @@ onBeforeUnmount(() => {
                 >
                   Your Email
                 </label>
+                <p v-if="errors.email" id="email-error" class="mt-2 text-red-400 text-sm font-ubuntu-mono">{{ errors.email }}</p>
               </div>
 
               <div class="group relative">
                 <textarea
-                  class="peer w-full bg-transparent border-b-2 border-white/50 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300 min-h-[120px]"
+                  class="peer w-full bg-transparent border-b-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400 py-2 px-2 transition-all duration-300 min-h-[120px]"
+                  :class="errors.message ? 'border-red-400' : 'border-white/50'"
                   name="message"
                   id="message"
                   placeholder="Message"
                   required
+                  :aria-invalid="errors.message ? 'true' : undefined"
+                  :aria-describedby="errors.message ? 'message-error' : undefined"
+                  @input="clearError('message')"
                 ></textarea>
                 <label
                   for="message"
@@ -261,13 +334,17 @@ onBeforeUnmount(() => {
                 >
                   Message
                 </label>
+                <p v-if="errors.message" id="message-error" class="mt-2 text-red-400 text-sm font-ubuntu-mono">{{ errors.message }}</p>
               </div>
 
+              <p v-if="errors.form" role="alert" class="text-red-400 font-ubuntu-mono text-center">{{ errors.form }}</p>
+
               <button
-                class="self-center mt-4 border-2 border-white text-white font-ubuntu-mono text-xl uppercase px-12 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 active:scale-95"
+                class="self-center mt-4 border-2 border-white text-white font-ubuntu-mono text-xl uppercase px-12 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-wait"
                 type="submit"
+                :disabled="sending"
               >
-                Send Message
+                {{ sending ? 'Sending...' : 'Send Message' }}
               </button>
             </form>
           </div>
