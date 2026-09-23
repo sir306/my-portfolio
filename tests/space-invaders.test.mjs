@@ -160,6 +160,36 @@ describe('space invaders sounds', () => {
     assert.equal(count('gameOver'), 1)
   })
 
+  // The game loop keeps running behind the pause and game over menus (as on the live
+  // site), so its sounds have to check the game state themselves.
+  const loopSounds = (from) => sounds.played.slice(from).filter((name) => name === 'enemyShoot' || name === 'explode')
+
+  test('invader fire and explosions stay quiet while paused', () => {
+    tap('Enter')
+    for (let n = 0; n < 5000 && count('enemyShoot') === 0; n++) {
+      if (n % 8 === 0) tap(' ')
+      frame()
+    }
+    tap('Escape')
+    const pausedAt = sounds.played.length
+    const score = () => Number(document.getElementById('scoreEl').textContent)
+    const scoreAtPause = score()
+    for (let n = 0; n < 600; n++) {
+      if (n % 8 === 0) tap(' ') // Space still fires behind the pause menu, as on the live site
+      frame()
+    }
+    assert.ok(score() > scoreAtPause, 'shots hit invaders while paused')
+    assert.deepEqual(loopSounds(pausedAt), [])
+  })
+
+  test('invader fire and explosions stay quiet on the game over screen', () => {
+    tap('Enter')
+    for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
+    const overAt = sounds.played.length
+    for (let n = 0; n < 3000; n++) frame()
+    assert.deepEqual(loopSounds(overAt), [])
+  })
+
   test('leaving the page stops the game reacting to keys', () => {
     cleanup()
     cleanup = null
@@ -173,5 +203,24 @@ describe('space invaders game loop', () => {
     tap('Enter') // the first frame spawns a wave whose images haven't loaded yet
     tap(' ')
     assert.doesNotThrow(runQueuedFrames)
+  })
+
+  // Frames with no image loading in between, as when invader.png is slow to arrive.
+  function framesWithoutLoading(n) {
+    for (let i = 0; i < n; i++) {
+      runQueuedFrames()
+      mock.timers.tick(16)
+    }
+  }
+
+  test('keeps running when a wave is still loading at the first invader-fire check', () => {
+    tap('Enter')
+    assert.doesNotThrow(() => framesWithoutLoading(120))
+  })
+
+  test('keeps running when only part of a wave has loaded', () => {
+    tap('Enter')
+    FakeImage.pending.at(-1).onload() // just the wave's last invader arrives
+    assert.doesNotThrow(() => framesWithoutLoading(3000))
   })
 })

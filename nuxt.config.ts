@@ -5,6 +5,15 @@ export default defineNuxtConfig({
   experimental: {
     appManifest: false
   },
+  hooks: {
+    // The game page loads its own audio when it opens. Prefetching it as well would make
+    // visitors download the (large) background music twice.
+    'build:manifest'(manifest) {
+      for (const entry of Object.values(manifest)) {
+        if (entry.resourceType === 'audio') entry.prefetch = false
+      }
+    },
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',

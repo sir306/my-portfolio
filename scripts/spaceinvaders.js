@@ -76,7 +76,8 @@ export function run({ sounds } = {}) {
     // if selectedInvaders position is greater than 0 then they can shoot otherwise call invaderShoots again till one does
     if (selectedInvader.position?.y > 0) {
       selectedInvader.shoot(invaderProjectiles);
-      sounds?.play("enemyShoot");
+      // the loop keeps running behind the pause and game over menus, so stay quiet there
+      if (game.active && !game.over) sounds?.play("enemyShoot");
     } else {
       invaderShoots(grid);
     }
@@ -277,7 +278,7 @@ export function run({ sounds } = {}) {
                 // add score
                 score += 100;
                 scoreEl.textContent = score;
-                sounds?.play("explode");
+                if (game.active && !game.over) sounds?.play("explode");
                 // create particle explosion on invader
                 createParticles({
                   object: invader,

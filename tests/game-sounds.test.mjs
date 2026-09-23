@@ -24,6 +24,12 @@ class FakeAudio {
   pause() {
     this.paused = true
   }
+  removeAttribute(name) {
+    if (name === 'src') this.src = ''
+  }
+  load() {
+    this.loads = (this.loads ?? 0) + 1
+  }
 }
 
 // Stands in for window, and counts the listeners still attached to it.
@@ -82,21 +88,41 @@ describe('game sounds', () => {
     FakeAudio.blocked = false
     page.dispatchEvent(new Event('keydown'))
     assert.equal(audio('music.wav').paused, false)
+    await settle()
 
     page.dispatchEvent(new Event('keydown'))
-    assert.equal(audio('music.wav').plays, 2, 'only retries once')
+    assert.equal(audio('music.wav').plays, 2, 'stops retrying once the music plays')
     assert.equal(page.listenerCount, 0)
   })
 
-  test('also starts blocked music on a click or tap', async () => {
+  test('keeps waiting when an interaction does not unlock audio', async () => {
+    // Browsers don't count some input (Esc, Shift, the start of a touch) as permission to play.
     const { sounds, audio } = setup()
     FakeAudio.blocked = true
     sounds.startMusic()
     await settle()
+    page.dispatchEvent(new Event('keydown'))
+    await settle()
+    assert.ok(page.listenerCount > 0, 'still listening')
+
     FakeAudio.blocked = false
-    page.dispatchEvent(new Event('pointerdown'))
+    page.dispatchEvent(new Event('keydown'))
     assert.equal(audio('music.wav').paused, false)
+    await settle()
+    assert.equal(page.listenerCount, 0)
   })
+
+  for (const event of ['pointerdown', 'pointerup']) {
+    test(`also starts blocked music on ${event} (a click or a tap)`, async () => {
+      const { sounds, audio } = setup()
+      FakeAudio.blocked = true
+      sounds.startMusic()
+      await settle()
+      FakeAudio.blocked = false
+      page.dispatchEvent(new Event(event))
+      assert.equal(audio('music.wav').paused, false)
+    })
+  }
 
   test('restarts an effect from the beginning each time it plays', () => {
     const { sounds, audio } = setup()
@@ -156,6 +182,7 @@ describe('game sounds', () => {
 
   test('destroy stops the music and cancels a pending autoplay retry', async () => {
     const { sounds, audio } = setup()
+    const music = audio('music.wav'), shoot = audio('shoot.wav') // destroy() clears their src
     FakeAudio.blocked = true
     sounds.startMusic()
     await settle()
@@ -163,15 +190,25 @@ describe('game sounds', () => {
     sounds.destroy()
     assert.equal(page.listenerCount, 0, 'leaves no listeners on the page')
     page.dispatchEvent(new Event('keydown'))
-    assert.equal(audio('music.wav').paused, true)
+    assert.equal(music.paused, true)
     sounds.play('shoot')
-    assert.equal(audio('shoot.wav').plays, 0)
+    assert.equal(shoot.plays, 0)
   })
 
   test('destroy pauses music that is playing', () => {
     const { sounds, audio } = setup()
+    const music = audio('music.wav')
     sounds.startMusic()
     sounds.destroy()
-    assert.equal(audio('music.wav').paused, true)
+    assert.equal(music.paused, true)
+  })
+
+  test('destroy releases every file, so an unfinished download stops', () => {
+    const { sounds } = setup()
+    sounds.destroy()
+    for (const element of sounds.elements) {
+      assert.equal(element.src, '')
+      assert.equal(element.loads, 1)
+    }
   })
 })

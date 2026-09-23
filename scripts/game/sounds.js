@@ -2,7 +2,9 @@
 //
 // Browsers block audio until the visitor has interacted with the page, so if the music
 // can't start straight away it starts on the first key press, click or tap instead.
-const RETRY_EVENTS = ['keydown', 'pointerdown']
+// Not every interaction counts (Esc, Shift, or the start of a touch don't), so keep
+// listening until the music really plays. Taps count on pointerup, clicks on pointerdown.
+const RETRY_EVENTS = ['keydown', 'pointerdown', 'pointerup']
 
 export function createSounds({ music, effects = {}, Audio = globalThis.Audio, target = globalThis } = {}) {
   const track = new Audio(music)
@@ -19,8 +21,8 @@ export function createSounds({ music, effects = {}, Audio = globalThis.Audio, ta
   }
 
   function retryMusic() {
-    removeRetry()
-    if (!muted && !destroyed) track.play().catch(() => {})
+    if (muted || destroyed) return
+    track.play().then(removeRetry, () => {})
   }
 
   function startMusic() {
@@ -43,8 +45,7 @@ export function createSounds({ music, effects = {}, Audio = globalThis.Audio, ta
     for (const el of elements) el.muted = muted
     // The key press that unmutes lets the browser play music it blocked earlier.
     if (!muted && wantMusic && !destroyed && track.paused) {
-      removeRetry()
-      track.play().catch(() => {})
+      track.play().then(removeRetry, () => {})
     }
     return muted
   }
@@ -52,7 +53,12 @@ export function createSounds({ music, effects = {}, Audio = globalThis.Audio, ta
   function destroy() {
     destroyed = true
     removeRetry()
-    for (const el of elements) el.pause()
+    for (const el of elements) {
+      el.pause()
+      // Dropping the source stops any download still in progress.
+      el.removeAttribute('src')
+      el.load()
+    }
   }
 
   return { elements, startMusic, play, toggleMute, destroy }
