@@ -2,7 +2,7 @@
   command = "npm run generate"
   publish = "dist"
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
+# Caching: no site-wide Cache-Control here on purpose. Netlify's default makes browsers
+# re-check pages on every visit, and Nuxt's build adds a year-long cache for the renamed
+# /_nuxt/ files (in dist/_headers). A site-wide max-age would override both, so after a
+# deploy, recent visitors would load old pages that point at deleted script files.
