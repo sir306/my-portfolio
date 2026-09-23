@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import gsap from 'gsap'
 
 useSeoMeta({

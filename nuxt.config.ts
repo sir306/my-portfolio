@@ -12,10 +12,10 @@ export default defineNuxtConfig({
     // Nuxt 4 stopped inlining global CSS (Tailwind) into the page; keep the Nuxt 3 output.
     inlineStyles: true
   },
-  // Tailwind 3 relies on empty variables written as `--tw-*: ;`. Nuxt 4's CSS minifiers
-  // (cssnano 8, and Lightning CSS in Vite 8) rewrite them as `--tw-*:;`, which older browsers
-  // reject, dropping effects such as the contact form's backdrop blur. Minify with esbuild
-  // only, which keeps the space, as the Nuxt 3 build did.
+  // Tailwind 3 relies on empty variables written as `--tw-*: ;`. cssnano 8 (Nuxt 4's CSS
+  // optimiser) rewrites them as `--tw-*:;`, which older browsers reject, dropping effects
+  // such as the contact form's backdrop blur. Turn it off, and minify with esbuild as the
+  // Nuxt 3 build (Vite 7) did, so the CSS stays as close as possible to the live site.
   postcss: {
     plugins: {
       cssnano: false
