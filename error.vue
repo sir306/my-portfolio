@@ -22,15 +22,20 @@ onMounted(() => {
   });
 })
 
-// Leaving the error page has to clear the error, not just change the URL.
-function goHome() {
+// Leaving the error page has to clear the error, not just change the URL. Modified or
+// non-primary clicks are left to the browser, so "open in new tab" still works.
+function goHome(event) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
   clearError({ redirect: '/' })
 }
 </script>
 
 <template>
   <NuxtLayout>
-    <StarField />
+    <!-- Lazy: error.vue is part of every page's main bundle, so this keeps the star
+         background's code and CSS off the other pages. -->
+    <LazyStarField />
     <div
       id="container"
       class="absolute w-full px-3 md:px-6 my-2 overflow-y-auto h-4/5"
@@ -42,6 +47,7 @@ function goHome() {
         style="transform: translateY(30px)"
       >
         {{ notFound ? '404' : error?.statusCode || 'Error' }}
+        <span class="sr-only">{{ notFound ? 'Page not found' : 'Something went wrong' }}</span>
       </h1>
       <hr
         ref="titleLine"
@@ -63,7 +69,7 @@ function goHome() {
           <a
             href="/"
             class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase hover:bg-white hover:text-gray-800"
-            @click.prevent="goHome"
+            @click="goHome"
           >
             Back to home
           </a>
