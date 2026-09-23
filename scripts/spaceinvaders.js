@@ -68,6 +68,9 @@ export function run({ sounds } = {}) {
   };
   let score = 0;
 
+  // paused: a game is in progress but on hold (the game over screen doesn't count)
+  const isPaused = () => game.newGame && !game.active && !game.over;
+
   // function for invaders to shoot
   function invaderShoots(grid) {
     // select an invader
@@ -76,8 +79,8 @@ export function run({ sounds } = {}) {
     // if selectedInvaders position is greater than 0 then they can shoot otherwise call invaderShoots again till one does
     if (selectedInvader.position?.y > 0) {
       selectedInvader.shoot(invaderProjectiles);
-      // the loop keeps running behind the pause and game over menus, so stay quiet there
-      if (game.active && !game.over) sounds?.play("enemyShoot");
+      // the loop keeps running behind the game over menu, so stay quiet there
+      if (!game.over) sounds?.play("enemyShoot");
     } else {
       invaderShoots(grid);
     }
@@ -166,7 +169,13 @@ export function run({ sounds } = {}) {
     } else {
       navbar.style.visibility = "visible";
       // game not active return stop animating
-      if(!game.newGame) return; // Only return if we haven't started a new game yet
+      if(!game.newGame) { animationId = null; return; } // Only return if we haven't started a new game yet
+    }
+
+    // paused: stop the loop so the game freezes; resuming starts it again
+    if (isPaused()) {
+      animationId = null;
+      return;
     }
 
     animationId = requestAnimationFrame(animate);
@@ -278,7 +287,7 @@ export function run({ sounds } = {}) {
                 // add score
                 score += 100;
                 scoreEl.textContent = score;
-                if (game.active && !game.over) sounds?.play("explode");
+                sounds?.play("explode");
                 // create particle explosion on invader
                 createParticles({
                   object: invader,
@@ -332,6 +341,11 @@ export function run({ sounds } = {}) {
     frames++;
   }
 
+  // start the loop unless it is already running, so there is only ever one
+  function startLoop() {
+    if (animationId === null) animate();
+  }
+
   animate();
 
   // function for pause opacity
@@ -363,7 +377,7 @@ export function run({ sounds } = {}) {
       game.active = true;
       sounds?.play("start");
       // start animate loop
-      animate();
+      startLoop();
     }
     // check to see if game restart
     else if (key === "Enter" && game.newGame && !game.active && game.over) {
@@ -380,7 +394,7 @@ export function run({ sounds } = {}) {
       game.over = false;
       sounds?.play("start");
       // start animate loop
-      animate();
+      startLoop();
     }
     // check game not still over and another key pressed
     else if (game.over) return;
@@ -393,7 +407,7 @@ export function run({ sounds } = {}) {
         keys.d.pressed = true;
         break;
       case " ":
-        if (!keys.space.pressed) {
+        if (!keys.space.pressed && !isPaused()) {
           if (game.active) sounds?.play("shoot");
           projectiles.push(
             new Projectile({
@@ -432,7 +446,7 @@ export function run({ sounds } = {}) {
           pausedScoreEl.textContent = "Current Score: " + score;
           console.log(pauseGame());
           game.active = pauseGame();
-          animate();
+          startLoop();
         }
         break;
     }

@@ -20,8 +20,10 @@ function loadImages() {
   for (const image of FakeImage.pending.splice(0)) image.onload?.()
 }
 
-// Every drawing call on the 2D canvas context is a no-op.
-const context = new Proxy({}, { get: () => () => {}, set: () => true })
+// Drawing calls on the 2D canvas context do nothing but are counted, by method name.
+const drawn = {}
+const context = new Proxy({}, { get: (_, method) => () => { drawn[method] = (drawn[method] ?? 0) + 1 }, set: () => true })
+const drawCount = () => Object.values(drawn).reduce((sum, n) => sum + n, 0)
 
 // Deterministic Math.random, so each run plays out the same way.
 function seededRandom(seed) {
@@ -40,6 +42,7 @@ beforeEach(() => {
   Math.random = seededRandom(42)
   mock.timers.enable({ apis: ['setTimeout'] })
   FakeImage.pending = []
+  for (const method of Object.keys(drawn)) delete drawn[method]
   page = new EventTarget()
   queuedFrames = []
   const elements = new Map()
@@ -160,11 +163,9 @@ describe('space invaders sounds', () => {
     assert.equal(count('gameOver'), 1)
   })
 
-  // The game loop keeps running behind the pause and game over menus (as on the live
-  // site), so its sounds have to check the game state themselves.
   const loopSounds = (from) => sounds.played.slice(from).filter((name) => name === 'enemyShoot' || name === 'explode')
 
-  test('invader fire and explosions stay quiet while paused', () => {
+  test('nothing plays while paused', () => {
     tap('Enter')
     for (let n = 0; n < 5000 && count('enemyShoot') === 0; n++) {
       if (n % 8 === 0) tap(' ')
@@ -172,16 +173,15 @@ describe('space invaders sounds', () => {
     }
     tap('Escape')
     const pausedAt = sounds.played.length
-    const score = () => Number(document.getElementById('scoreEl').textContent)
-    const scoreAtPause = score()
     for (let n = 0; n < 600; n++) {
-      if (n % 8 === 0) tap(' ') // Space still fires behind the pause menu, as on the live site
+      if (n % 8 === 0) tap(' ')
       frame()
     }
-    assert.ok(score() > scoreAtPause, 'shots hit invaders while paused')
-    assert.deepEqual(loopSounds(pausedAt), [])
+    assert.deepEqual(sounds.played.slice(pausedAt), [])
   })
 
+  // The game keeps animating behind the game over menu (as on the live site), and
+  // invaders keep firing there, so their sound has to check the game state itself.
   test('invader fire and explosions stay quiet on the game over screen', () => {
     tap('Enter')
     for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
@@ -222,5 +222,64 @@ describe('space invaders game loop', () => {
     tap('Enter')
     FakeImage.pending.at(-1).onload() // just the wave's last invader arrives
     assert.doesNotThrow(() => framesWithoutLoading(3000))
+  })
+})
+
+describe('space invaders pause and restart', () => {
+  test('pausing freezes the game until you resume', () => {
+    tap('Enter')
+    for (let n = 0; n < 700; n++) frame() // invaders are on screen and firing by now
+    assert.ok(count('enemyShoot') > 0 && count('gameOver') === 0, 'mid-game when pausing')
+    tap('Escape')
+    frame() // the frame already queued when Esc was pressed
+    const drawnAtPause = drawCount()
+    for (let n = 0; n < 5000; n++) frame()
+    assert.equal(drawCount(), drawnAtPause, 'nothing moves or is redrawn while paused')
+    assert.equal(count('gameOver'), 0, "you can't be killed while paused")
+
+    tap('Escape')
+    frame()
+    assert.ok(drawCount() > drawnAtPause, 'the game carries on after resuming')
+  })
+
+  test("Space while paused doesn't store up shots for when the game resumes", () => {
+    tap('Enter')
+    for (let n = 0; n < 5; n++) frame() // early on: no shots or explosions on screen yet
+    tap('Escape')
+    frame()
+    for (let n = 0; n < 10; n++) tap(' ')
+    tap('Escape')
+    delete drawn.arc
+    frame()
+    assert.equal(drawn.arc ?? 0, 0, 'no shots appear on resume')
+  })
+
+  test("pausing and resuming doesn't speed the game up", () => {
+    tap('Enter')
+    frame()
+    for (let n = 0; n < 5; n++) {
+      tap('Escape')
+      frame()
+      tap('Escape')
+      frame()
+      // a quick double tap, both presses landing between two frames
+      tap('Escape')
+      tap('Escape')
+      frame()
+    }
+    assert.equal(queuedFrames.length, 1, 'a single game loop')
+  })
+
+  test("restarting after a game over doesn't speed the game up", () => {
+    tap('Enter')
+    for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
+    for (let n = 0; n < 200; n++) frame() // the game over menu is up
+    const drawnOnMenu = drawCount()
+    frame()
+    assert.ok(drawCount() > drawnOnMenu, 'the game keeps animating behind the game over menu, as on the live site')
+
+    tap('Enter')
+    frame()
+    assert.equal(queuedFrames.length, 1, 'a single game loop')
   })
 })
