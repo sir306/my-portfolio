@@ -1,6 +1,34 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
 
+// Tailwind 4 writes each colour with an opacity (e.g. bg-black/90) twice: as hex, then as
+// color-mix(in oklab) for browsers that support it. Browsers fade between oklab colours in a
+// different colour space, so hover and focus fades from these colours would look different
+// part-way through. Drop the color-mix copies so every browser uses the hex values, which are
+// the same as Tailwind 3's.
+function hexOpacityColours() {
+  const block = /@supports\s*\(\s*color:\s*color-mix\(\s*in lab,\s*red,\s*red\s*\)\s*\)\s*\{/g
+  return {
+    name: 'hex-opacity-colours',
+    transform(code: string, id: string) {
+      if (!/\.css($|\?)/.test(id) || !code.includes('color-mix(in lab')) return
+      let out = ''
+      let last = 0
+      block.lastIndex = 0
+      for (let match = block.exec(code); match; match = block.exec(code)) {
+        let end = block.lastIndex
+        for (let depth = 1; depth > 0 && end < code.length; end++) {
+          if (code[end] === '{') depth++
+          else if (code[end] === '}') depth--
+        }
+        out += code.slice(last, match.index)
+        last = block.lastIndex = end
+      }
+      return out + code.slice(last)
+    }
+  }
+}
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-12-17',
@@ -25,7 +53,7 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/tailwind.css'],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), hexOpacityColours()],
     build: {
       cssMinify: 'esbuild'
     }
