@@ -17,7 +17,8 @@
 @theme {
   /* Breakpoints in px, as in Tailwind 3. Tailwind 4 uses rem, which in a media query
      follows the visitor's browser font size, so a larger default font would switch
-     layouts at wider screens than the live site does. */
+     layouts at wider screens than the live site does. Use px for one-off breakpoints
+     too (e.g. min-[900px]:), so they sort among these. */
   --breakpoint-*: initial;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;

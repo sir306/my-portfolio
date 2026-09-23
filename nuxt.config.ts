@@ -1,16 +1,20 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+import type { Plugin } from 'vite'
 
-// Tailwind 4 writes each colour with an opacity (e.g. bg-black/90) twice: as hex, then as
-// color-mix(in oklab) for browsers that support it. Browsers fade between oklab colours in a
-// different colour space, so hover and focus fades from these colours would look different
-// part-way through. Drop the color-mix copies so every browser uses the hex values, which are
-// the same as Tailwind 3's.
-function hexOpacityColours() {
+// Tailwind 4 writes each theme colour with an opacity (e.g. bg-black/90) twice: a hex
+// fallback, then a color-mix(in oklab) copy for browsers that support it. Browsers fade
+// between oklab colours in a different colour space, so hover and focus fades from these
+// colours would look different part-way through. The production build drops the oklab
+// copies, so every browser uses the hex values, the same as Tailwind 3's. (`nuxt dev` still
+// fades the Tailwind 4 way; check fades on a generated build.) Copies based on currentColor
+// or a CSS variable are kept, because their fallback has no transparency.
+function hexOpacityColours(): Plugin {
   const block = /@supports\s*\(\s*color:\s*color-mix\(\s*in lab,\s*red,\s*red\s*\)\s*\)\s*\{/g
   return {
     name: 'hex-opacity-colours',
-    transform(code: string, id: string) {
+    apply: 'build',
+    transform(code, id) {
       if (!/\.css($|\?)/.test(id) || !code.includes('color-mix(in lab')) return
       let out = ''
       let last = 0
@@ -21,10 +25,12 @@ function hexOpacityColours() {
           if (code[end] === '{') depth++
           else if (code[end] === '}') depth--
         }
+        block.lastIndex = end
+        if (/currentcolor|var\(--(?!color-)/i.test(code.slice(match.index, end))) continue
         out += code.slice(last, match.index)
-        last = block.lastIndex = end
+        last = end
       }
-      return out + code.slice(last)
+      return { code: out + code.slice(last), map: { mappings: '' } }
     }
   }
 }
