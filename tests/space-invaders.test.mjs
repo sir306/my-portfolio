@@ -96,6 +96,77 @@ function frame() {
   loadImages()
   mock.timers.tick(16)
 }
+const count = (name) => sounds.played.filter((played) => played === name).length
+
+describe('space invaders sounds', () => {
+  test('Enter plays the start sound', () => {
+    tap('Enter')
+    assert.deepEqual(sounds.played, ['start'])
+  })
+
+  test('firing plays the shoot sound during a game but not on the start menu', () => {
+    tap(' ')
+    assert.deepEqual(sounds.played, [])
+    tap('Enter')
+    tap(' ')
+    assert.deepEqual(sounds.played, ['start', 'shoot'])
+  })
+
+  test('Esc plays the select sound when pausing and resuming', () => {
+    tap('Enter')
+    tap('Escape')
+    tap('Escape')
+    assert.deepEqual(sounds.played, ['start', 'select', 'select'])
+  })
+
+  test('M toggles mute on the start menu and mid-game, ignoring a held key', () => {
+    tap('m')
+    press('m', { repeat: true })
+    assert.equal(sounds.toggles, 1)
+    tap('Enter')
+    tap('M')
+    assert.equal(sounds.toggles, 2)
+    assert.deepEqual(sounds.played, ['start'], 'M does nothing else')
+  })
+
+  test('destroying invaders, invaders firing and losing each play their sound', () => {
+    tap('Enter')
+    // Shoot for a while, then stop so the invaders can come down, fire back and win.
+    for (let n = 0; n < 600; n++) {
+      if (n % 8 === 0) tap(' ')
+      frame()
+    }
+    for (let n = 0; n < 20000 && count('gameOver') === 0; n++) frame()
+    // gameOver() runs again on later frames; the sound must not repeat
+    for (let n = 0; n < 300; n++) frame()
+
+    assert.ok(count('explode') > 0, 'an invader was destroyed')
+    assert.ok(count('enemyShoot') > 0, 'an invader fired')
+    assert.equal(count('gameOver'), 1)
+
+    tap('m')
+    assert.equal(sounds.toggles, 1, 'M works on the game over screen')
+  })
+
+  test('invaders reaching the ship play the game over sound only once', () => {
+    cleanup()
+    globalThis.innerHeight = 150 // a short screen, so the invaders reach the ship quickly
+    cleanup = run({ sounds })
+    loadImages()
+    tap('Enter')
+    for (let n = 0; n < 5000 && count('gameOver') === 0; n++) frame()
+    for (let n = 0; n < 100; n++) frame() // gameOver() keeps running while the invaders overlap the ship
+    assert.equal(document.getElementById('gameOverReasonEl').textContent, 'You let the invaders get past you!')
+    assert.equal(count('gameOver'), 1)
+  })
+
+  test('leaving the page stops the game reacting to keys', () => {
+    cleanup()
+    cleanup = null
+    tap('Enter')
+    assert.deepEqual(sounds.played, [])
+  })
+})
 
 describe('space invaders game loop', () => {
   test('keeps running when a shot is in flight while new invaders are still loading', () => {

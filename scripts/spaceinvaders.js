@@ -3,7 +3,7 @@ import { createParticles } from "./game/methods/CreateParticle.js";
 import { Grid } from "./game/classes/Grid.js";
 import { Projectile } from "./game/classes/Projectile.js";
 
-export function run() {
+export function run({ sounds } = {}) {
   // get canvas and 2d context
   const spaceCanvas = document.getElementById("space-canvas");
   if (!spaceCanvas) return; // Guard clause
@@ -76,6 +76,7 @@ export function run() {
     // if selectedInvaders position is greater than 0 then they can shoot otherwise call invaderShoots again till one does
     if (selectedInvader.position?.y > 0) {
       selectedInvader.shoot(invaderProjectiles);
+      sounds?.play("enemyShoot");
     } else {
       invaderShoots(grid);
     }
@@ -118,6 +119,8 @@ export function run() {
 
   // game over function
   function gameOver(reason, timeout) {
+    // gameOver can run on several frames in a row, so only the first call plays the sound
+    if (!game.over) sounds?.play("gameOver");
     //pause animations
     setTimeout(() => {
       game.active = false;
@@ -274,6 +277,7 @@ export function run() {
                 // add score
                 score += 100;
                 scoreEl.textContent = score;
+                sounds?.play("explode");
                 // create particle explosion on invader
                 createParticles({
                   object: invader,
@@ -341,7 +345,12 @@ export function run() {
     spaceCanvas.height = innerHeight;
   };
 
-  const onKeyDown = ({ key }) => {
+  const onKeyDown = ({ key, repeat }) => {
+    // mute works in every state: menus, playing, paused and game over
+    if (key === "m" || key === "M") {
+      if (!repeat) sounds?.toggleMute();
+      return;
+    }
     if (game.over && key !== "Enter") return;
     // check if key is enter and the request is a new game
     else if (key === "Enter" && !game.newGame) {
@@ -351,6 +360,7 @@ export function run() {
       // set game settings
       game.newGame = true;
       game.active = true;
+      sounds?.play("start");
       // start animate loop
       animate();
     }
@@ -367,6 +377,7 @@ export function run() {
       game.newGame = true;
       game.active = true;
       game.over = false;
+      sounds?.play("start");
       // start animate loop
       animate();
     }
@@ -382,6 +393,7 @@ export function run() {
         break;
       case " ":
         if (!keys.space.pressed) {
+          if (game.active) sounds?.play("shoot");
           projectiles.push(
             new Projectile({
               position: {
@@ -414,6 +426,7 @@ export function run() {
         break;
       case "Escape":
         if (game.newGame && !game.over) {
+          sounds?.play("select");
           pauseMenu.style.opacity = pauseOpacity();
           pausedScoreEl.textContent = "Current Score: " + score;
           console.log(pauseGame());

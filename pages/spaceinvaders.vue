@@ -1,7 +1,14 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { run } from "~/scripts/spaceinvaders";
+import { createSounds } from "~/scripts/game/sounds";
 import backgroundMusic from "~/assets/audio/backgroundMusic.wav";
+import shootSound from "~/assets/audio/shoot.wav";
+import enemyShootSound from "~/assets/audio/enemyShoot.wav";
+import explodeSound from "~/assets/audio/explode.wav";
+import gameOverSound from "~/assets/audio/gameOver.mp3";
+import startSound from "~/assets/audio/start.mp3";
+import selectSound from "~/assets/audio/select.mp3";
 import { cleanupScene } from '~/utils/threeHelper'
 
 useSeoMeta({
@@ -37,6 +44,7 @@ let scene = null
 let animationId = null
 let camera = null
 let gameCleanup = null; // Store the cleanup function
+let sounds = null
 
 function onWindowResize() {
   if (camera && renderer) {
@@ -49,9 +57,22 @@ function onWindowResize() {
 onMounted(() => {
     if(!process.client) return
 
-    
+    // Background music starts with the page; effects play from the game
+    sounds = createSounds({
+      music: backgroundMusic,
+      effects: {
+        shoot: shootSound,
+        enemyShoot: enemyShootSound,
+        explode: explodeSound,
+        gameOver: gameOverSound,
+        start: startSound,
+        select: selectSound,
+      },
+    })
+    sounds.startMusic()
+
     // Run the game script and store cleanup
-    gameCleanup = run();
+    gameCleanup = run({ sounds });
 
     // Three.js background setup
     scene = new Scene();
@@ -120,6 +141,7 @@ onBeforeUnmount(() => {
     if (gameCleanup) {
         gameCleanup();
     }
+    sounds?.destroy()
 });
 </script>
 
@@ -141,6 +163,7 @@ onBeforeUnmount(() => {
         <p>Press 'A' and 'D' to move left and right</p>
         <p>Press 'Space' to shoot</p>
         <p>Press 'Esc' to pause</p>
+        <p>Press 'M' to mute or unmute</p>
       </div>
     </div>
     <div id="pausedMenu">
@@ -153,9 +176,6 @@ onBeforeUnmount(() => {
     </div>
     <div id="startMenu">
       <div>
-        <!-- <audio id="backgroundMusic" autoplay loop>
-          <source :src="backgroundMusic" type="audio/wav" />
-        </audio> -->
         <h2>The Controls</h2>
         <hr style="margin-bottom: 1.2em" />
         <p>Destroy as many Invaders as you can!</p>
@@ -163,6 +183,7 @@ onBeforeUnmount(() => {
         <p>Press 'A' and 'D' to move left and right</p>
         <p>Press 'Space' to shoot</p>
         <p>Press 'Esc' to pause</p>
+        <p>Press 'M' to mute or unmute</p>
         <p>Good luck and enjoy, Press 'Enter' to start!</p>
       </div>
     </div>
