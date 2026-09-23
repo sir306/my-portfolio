@@ -1,7 +1,7 @@
-import { Player } from "./game/classes/Player";
-import { createParticles } from "./game/methods/CreateParticle";
-import { Grid } from "./game/classes/Grid";
-import { Projectile } from "./game/classes/Projectile";
+import { Player } from "./game/classes/Player.js";
+import { createParticles } from "./game/methods/CreateParticle.js";
+import { Grid } from "./game/classes/Grid.js";
+import { Projectile } from "./game/classes/Projectile.js";
 
 export function run() {
   // get canvas and 2d context
@@ -74,7 +74,7 @@ export function run() {
     let selectedInvader =
       grid.invaders[Math.floor(Math.random() * grid.invaders.length)];
     // if selectedInvaders position is greater than 0 then they can shoot otherwise call invaderShoots again till one does
-    if (selectedInvader.position.y > 0) {
+    if (selectedInvader.position?.y > 0) {
       selectedInvader.shoot(invaderProjectiles);
     } else {
       invaderShoots(grid);
@@ -225,7 +225,7 @@ export function run() {
       // spawn invader projectiles
       if (frames % 100 === 0 && grid.invaders.length > 0) {
         // are invaders in view of screen
-        if (grid.invaders[grid.invaders.length - 1].position.y > 0) {
+        if (grid.invaders[grid.invaders.length - 1].position?.y > 0) {
           invaderShoots(grid);
         }
       }
@@ -245,6 +245,8 @@ export function run() {
 
       for (let i = grid.invaders.length - 1; i >= 0; i--) {
         const invader = grid.invaders[i];
+        // an invader has no position (and isn't drawn) until its image loads, so it can't be hit yet
+        if (!invader.position) continue;
         invader.update({ velocity: grid.velocity, spaceContext });
 
         // loop through projectile array

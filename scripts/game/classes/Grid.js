@@ -1,4 +1,4 @@
-import { Invader } from "./Invader";
+import { Invader } from "./Invader.js";
 export class Grid {
   constructor() {
     this.position = {

@@ -1,4 +1,4 @@
-import { InvaderProjectile } from "./InvaderProjectile";
+import { InvaderProjectile } from "./InvaderProjectile.js";
 export class Invader {
   constructor({ position }) {
     this.velocity = {

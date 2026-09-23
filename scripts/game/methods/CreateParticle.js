@@ -1,4 +1,4 @@
-import { Particle } from "../classes/Particle";
+import { Particle } from "../classes/Particle.js";
 export function createParticles({ object, color, particles }) {
   for (let i = 0; i < 25; i++) {
     particles.push(

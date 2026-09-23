@@ -10,7 +10,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "test": "node --test tests/contact-form.test.mjs",
+    "test": "node --disable-warning=ExperimentalWarning --test tests/contact-form.test.mjs tests/space-invaders.test.mjs",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
