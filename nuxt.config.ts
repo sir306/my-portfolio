@@ -3,7 +3,28 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-12-17',
   experimental: {
-    appManifest: false
+    appManifest: false,
+    // Nuxt 4 would load the entry chunk through an import map, which browsers without
+    // import map support (e.g. Safari before 16.4) can't run. Keep the Nuxt 3 behaviour.
+    entryImportMap: false
+  },
+  features: {
+    // Nuxt 4 stopped inlining global CSS (Tailwind) into the page; keep the Nuxt 3 output.
+    inlineStyles: true
+  },
+  // Tailwind 3 relies on empty variables written as `--tw-*: ;`. Nuxt 4's CSS minifiers
+  // (cssnano 8, and Lightning CSS in Vite 8) rewrite them as `--tw-*:;`, which older browsers
+  // reject, dropping effects such as the contact form's backdrop blur. Minify with esbuild
+  // only, which keeps the space, as the Nuxt 3 build did.
+  postcss: {
+    plugins: {
+      cssnano: false
+    }
+  },
+  vite: {
+    build: {
+      cssMinify: 'esbuild'
+    }
   },
   hooks: {
     // The game page loads its own audio when it opens. Prefetching it as well would make
