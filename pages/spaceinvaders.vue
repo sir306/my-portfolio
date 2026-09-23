@@ -2,7 +2,7 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { run } from "~/scripts/spaceinvaders";
 import { createSounds } from "~/scripts/game/sounds";
-import backgroundMusic from "~/assets/audio/backgroundMusic.wav";
+import backgroundMusic from "~/assets/audio/backgroundMusic.mp3";
 import shootSound from "~/assets/audio/shoot.wav";
 import enemyShootSound from "~/assets/audio/enemyShoot.wav";
 import explodeSound from "~/assets/audio/explode.wav";
