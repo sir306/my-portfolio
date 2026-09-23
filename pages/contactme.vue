@@ -251,6 +251,13 @@ onBeforeUnmount(() => {
               >GitHub</a
             >
           </p>
+          <p class="py-2">
+            <a
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              href="https://www.youtube.com/channel/UCGYiCTWIWc5LFNIbw02PizA"
+              >YouTube Channel</a
+            >
+          </p>
         </div>
         <hr
           ref="formLine"
