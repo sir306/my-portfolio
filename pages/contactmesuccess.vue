@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import gsap from 'gsap'
+import { cleanupScene } from '~/utils/threeHelper'
 import {
   Scene,
   PerspectiveCamera,
@@ -18,10 +19,23 @@ const titleLine = ref(null)
 const formLine = ref(null)
 const endLine = ref(null)
 
+let renderer = null
+let scene = null
+let animationId = null
+let camera = null
+
+function onWindowResize() {
+  if (camera && renderer) {
+    camera.aspect = innerWidth / innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(innerWidth, innerHeight)
+  }
+}
+
 onMounted(() => {
     if(!process.client) return
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
+    scene = new Scene();
+    camera = new PerspectiveCamera(
       75,
       innerWidth / innerHeight,
       0.1,
@@ -29,10 +43,10 @@ onMounted(() => {
     );
     camera.position.z = 80;
 
-    const renderer = new WebGLRenderer({ canvas: canvas.value });
+    renderer = new WebGLRenderer({ canvas: canvas.value, powerPreference: "high-performance" });
 
     renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const light = new DirectionalLight(0xffffff, 1);
     light.position.set(0, 1, 1);
@@ -46,7 +60,8 @@ onMounted(() => {
     const starMaterial = new PointsMaterial({ color: 0xffffff });
     const starVertices = [];
 
-    for (let i = 0; i < 10000; i++) {
+    // Reduced star count for performance
+    for (let i = 0; i < 5000; i++) {
         const x = (Math.random() - 0.5) * 2000;
         const y = (Math.random() - 0.5) * 2000;
         const z = (Math.random() - 0.5) * 2000;
@@ -64,7 +79,7 @@ onMounted(() => {
     let frame = 0;
 
     function animate() {
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
       renderer.render(scene, camera);
 
       frame += 0.01;
@@ -74,11 +89,7 @@ onMounted(() => {
     }
     animate();
 
-    addEventListener("resize", () => {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
+    window.addEventListener("resize", onWindowResize);
 
     gsap.to(title.value, {
       opacity: 1,
@@ -106,6 +117,11 @@ onMounted(() => {
       ease: "expo",
     });
 })
+
+onBeforeUnmount(() => {
+    cleanupScene(scene, renderer, animationId)
+    window.removeEventListener("resize", onWindowResize);
+});
 </script>
 
 <template>
@@ -152,6 +168,13 @@ onMounted(() => {
               class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
               href="https://www.linkedin.com/in/nicholas-harding-9b240a1a3/"
               >LinkedIn Profile</a
+            >
+          </p>
+          <p class="py-2">
+            <a
+              class="border-solid border-2 py-1 px-4 rounded-md border-white text-white font-exo2 text-sm md:text-lg uppercase opacity-1 mb-3 hover:bg-white hover:text-gray-800"
+              href="https://github.com/sir306"
+              >GitHub</a
             >
           </p>
           <p class="py-2">
